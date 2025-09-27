@@ -3,7 +3,7 @@ import { Header } from '../components/UI/Header'
 export default function AltaJugador() {
   return (
     <>
-    <Header></Header>
+    {/*<Header></Header>*/}
     <div className="p-6">
       <h1 className="text-2xl font-bold">Alta de Liga</h1>
       <form className="mt-4 space-y-3">

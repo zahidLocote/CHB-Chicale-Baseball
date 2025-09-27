@@ -7,7 +7,7 @@ import AltaLigas from './pages/AltaLigas.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AltaLigas/>
+    <App/>
   </React.StrictMode>,
 )
 
