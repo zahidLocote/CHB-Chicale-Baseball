@@ -1,8 +1,26 @@
+import { useState } from 'react'
 import PictureBox from '../components/UI/PictureBox'
 export default function AltaEquipos() {
-    function handleSubmit(e) {
+    const [nombre, setNombre] = useState('')
+    const [entrenador, setEntrenador] = useState('')
+    const [liga, setLiga] = useState('')
+    const [logo, setLogo] = useState(null)
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log('Formulario enviado')
+
+        const equipo = {
+            nombre,
+            entrenador,
+            liga,
+            logo: logo ? logo.name : null // o usa una URL si ya la tienes
+        }
+
+    await fetch('/api/equipos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(equipo),
+})
     }
 
     return (
@@ -17,14 +35,18 @@ export default function AltaEquipos() {
                             <input
                                 type="text"
                                 placeholder="Nombre de Equipo"
+                                value={nombre}
+                                onChange={(e) => setNombre(e.target.value)}
                                 className="border p-2 w-full rounded text-center placeholder:text-center max-w-sm"
                             />
                             <input
                                 type="text"
                                 placeholder="Entrenador"
+                                value={entrenador}
+                                onChange={(e) => setEntrenador(e.target.value)}
                                 className="border p-2 w-full rounded text-center placeholder:text-center max-w-sm"
                             />
-                            <select className="border p-2 w-full rounded bg-white max-w-sm">
+                            <select value={liga} onChange={(e) => setLiga(e.target.value)} className="border p-2 w-full rounded bg-white max-w-sm">
                                 <option value="" className='text-center'>Selecciona una liga</option>
                                 <option value="juvenil" className='text-center'>Juvenil</option>
                                 <option value="intermedia" className='text-center'>Intermedia</option>
@@ -42,7 +64,7 @@ export default function AltaEquipos() {
                     <div className="flex justify-center gap-4">
                         <button
                             type="button"
-                            className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-700"
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-pink-700"
                         >
                             CANCELAR
                         </button>
