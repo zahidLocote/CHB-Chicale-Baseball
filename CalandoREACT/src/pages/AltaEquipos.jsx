@@ -1,10 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import PictureBox from '../components/UI/PictureBox'
 export default function AltaEquipos() {
     const [nombre, setNombre] = useState('')
     const [entrenador, setEntrenador] = useState('')
-    const [liga, setLiga] = useState('')
+    const [ligaId, setLigaId] = useState('')
+    const [ligas, setLigas] = useState([])
     const [logo, setLogo] = useState(null)
+
+    useEffect(() => {
+        fetch('http://localhost:3001/ligas')
+            .then(res => res.json())
+            .then(data => setLigas(data))
+    }, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -12,15 +19,15 @@ export default function AltaEquipos() {
         const equipo = {
             nombre,
             entrenador,
-            liga,
-            logo: logo ? logo.name : null // o usa una URL si ya la tienes
+            ligaId: Number(ligaId),
+            logo: logo ? logo.name : null
         }
 
-    await fetch('/api/equipos', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(equipo),
-})
+        await fetch('/api/equipos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(equipo),
+        })
     }
 
     return (
@@ -46,11 +53,11 @@ export default function AltaEquipos() {
                                 onChange={(e) => setEntrenador(e.target.value)}
                                 className="border p-2 w-full rounded text-center placeholder:text-center max-w-sm"
                             />
-                            <select value={liga} onChange={(e) => setLiga(e.target.value)} className="border p-2 w-full rounded bg-white max-w-sm">
-                                <option value="" className='text-center'>Selecciona una liga</option>
-                                <option value="juvenil" className='text-center'>Juvenil</option>
-                                <option value="intermedia" className='text-center'>Intermedia</option>
-                                <option value="mayor" className='text-center'>Mayor</option>
+                            <select value={ligaId} onChange={e => setLigaId(Number(e.target.value))}>
+                                <option value="">Selecciona una liga</option>
+                                {ligas.map(l => (
+                                    <option key={l.id} value={l.id}>{l.nombre}</option>
+                                ))}
                             </select>
                         </div>
 

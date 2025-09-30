@@ -12,11 +12,23 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
+model presidente{
+  id Int @id @default(autoincrement())
+  nombre String
+  contacto String
+}
+model Liga{
+  id Int @id @default(autoincrement())
+  nombre String
+  edad_min Int
+  edad_max Int
+  equipo equipo[]
+}
 model equipo{
   id  Int @id @default(autoincrement())
   nombre String
   entrenador String
-  liga String
   logo String?
+  ligaId Int?
+  liga Liga?   @relation(fields: [ligaId], references: [id])
 }
