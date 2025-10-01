@@ -14,7 +14,7 @@ export default function PictureBox({ editable = false, initialImage = null, onIm
 
   return (
     <div className="flex flex-col items-center space-y-2">
-      <div className="w-40 h-40 border rounded flex items-center justify-center bg-gray-100 overflow-hidden">
+      <div className="w-55 h-35 border rounded flex items-center justify-center bg-gray-100 overflow-hidden">
         {preview ? (
           <img src={preview} alt="Logo del equipo" className="w-full h-full object-cover" />
         ) : (

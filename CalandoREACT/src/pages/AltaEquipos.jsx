@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
+import { crearEquipo } from '../../services/equipoService'
 import PictureBox from '../components/UI/PictureBox'
 export default function AltaEquipos() {
     const [nombre, setNombre] = useState('')
     const [entrenador, setEntrenador] = useState('')
-    const [ligaId, setLigaId] = useState('')
+    const [ligaId, setLigaId] = useState('1')
     const [ligas, setLigas] = useState([])
     const [logo, setLogo] = useState(null)
 
@@ -15,19 +16,11 @@ export default function AltaEquipos() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
-        const equipo = {
-            nombre,
-            entrenador,
-            ligaId: Number(ligaId),
-            logo: logo ? logo.name : null
+        try{
+            await crearEquipo({ nombre, entrenador, logo, ligaId })
+        }catch(error){
+            console.error(error)
         }
-
-        await fetch('/api/equipos', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(equipo),
-        })
     }
 
     return (
@@ -38,7 +31,7 @@ export default function AltaEquipos() {
                 <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
                     <div className="flex flex-row gap-6">
                         {/* Campos de texto */}
-                        <div className="flex-1 space-y-4">
+                        <div className="flex flex-col flex-1 space-y-15">
                             <input
                                 type="text"
                                 placeholder="Nombre de Equipo"
@@ -53,12 +46,6 @@ export default function AltaEquipos() {
                                 onChange={(e) => setEntrenador(e.target.value)}
                                 className="border p-2 w-full rounded text-center placeholder:text-center max-w-sm"
                             />
-                            <select value={ligaId} onChange={e => setLigaId(Number(e.target.value))}>
-                                <option value="">Selecciona una liga</option>
-                                {ligas.map(l => (
-                                    <option key={l.id} value={l.id}>{l.nombre}</option>
-                                ))}
-                            </select>
                         </div>
 
                         {/* PictureBox */}

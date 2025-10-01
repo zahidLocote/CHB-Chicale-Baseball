@@ -11,7 +11,7 @@ app.use(cors())
 app.use(express.json())
 
 app.post('/equipos', async (req, res) => {
-  const { nombre, entrenador, ligaId, logo } = req.body
+  const { nombre, entrenador, logo, ligaId } = req.body
 
   try {
     const nuevoEquipo = await prisma.equipo.create({
@@ -19,10 +19,8 @@ app.post('/equipos', async (req, res) => {
         nombre,
         entrenador,
         logo,
-        liga: {
-          connect: { id: ligaId }
-        }
-      }
+        liga: ligaId ? { connect: { id: ligaId } } : undefined
+    }
     })
     res.json(nuevoEquipo)
   } catch (error) {
