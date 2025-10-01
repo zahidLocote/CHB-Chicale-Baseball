@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import { Header } from './components/UI/Header'
 import  AltaLigas  from './pages/AltaLigas'
@@ -30,8 +31,8 @@ function App() {
         </button>
       </div>
 
-      {vista === 'ligas' && <AltaLigas />}
-      {vista === 'equipos' && <AltaEquipos />}
+      {vista === 'ligas' && <AltaLigas onCancel={() => setVista(null)} />}
+      {vista === 'equipos' && <AltaEquipos onCancel={() => setVista(null)} />}
     </div>
 
     </>

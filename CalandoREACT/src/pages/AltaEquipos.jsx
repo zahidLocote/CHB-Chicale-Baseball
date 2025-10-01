@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { crearEquipo } from '../../services/equipoService'
 import PictureBox from '../components/UI/PictureBox'
-export default function AltaEquipos() {
+import useFormValidation from '../hooks/useFormValidation'
+
+export default function AltaEquipos({ onCancel }) {
+    const navigate = useNavigate()
+    const { validarEquipos } = useFormValidation()
     const [nombre, setNombre] = useState('')
     const [entrenador, setEntrenador] = useState('')
     const [ligaId, setLigaId] = useState('1')
@@ -16,8 +21,17 @@ export default function AltaEquipos() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        const errores = validarEquipos({ nombre, entrenador })
+        if (Object.keys(errores).length > 0) {
+            alert(Object.values(errores).join('\n'))
+            return
+        }
         try{
             await crearEquipo({ nombre, entrenador, logo, ligaId })
+            setNombre('')
+            setEntrenador('')
+            setLogo(null)
+            alert('Equipo registrado exitosamente')
         }catch(error){
             console.error(error)
         }
@@ -59,6 +73,7 @@ export default function AltaEquipos() {
                         <button
                             type="button"
                             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-pink-700"
+                            onClick={onCancel}
                         >
                             CANCELAR
                         </button>
