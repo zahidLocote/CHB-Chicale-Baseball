@@ -64,7 +64,7 @@ export default function AltaJugador() {
     return Object.keys(newErrors).length === 0;
   };
 
-   // MODIFICACIÓN 3: Agregué funciones para manejar los number pickers
+   //Funciones para manejar los number pickers
   const incrementAge = (type) => {
     if (type === 'min' && formData.edadMin < 100) {
       setFormData({
@@ -113,7 +113,7 @@ export default function AltaJugador() {
     }
   };
 
-  // MODIFICACIÓN 4: Agregué función para manejar cambio directo en el input numérico
+  //Función para manejar cambio directo en el input numérico
   const handleAgeInputChange = (type, value) => {
     const numValue = parseInt(value) || 5;
     if (type === 'min') {
@@ -217,7 +217,7 @@ export default function AltaJugador() {
       console.log(formDataToSend)
       */
       //Temporal hasta que se usen archivos (preparar la API)
-      const payload = {
+      const ligaInformacion = {
         nombreLiga: formData.nombreLiga.trim(),
         edadMin: formData.edadMin,
         edadMax: formData.edadMax,
@@ -225,7 +225,7 @@ export default function AltaJugador() {
         nombrePresidente: formData.nombrePresidente.trim(),
         contactoPresidente: formData.contactoPresidente.trim()
       };
-      const response = await registrarLiga(payload);
+      const response = await registrarLiga(ligaInformacion);
       
       // Mostrar popup de éxito
       setShowPopup(true);
@@ -300,19 +300,7 @@ export default function AltaJugador() {
               {errors.nombreLiga && <p className="text-red-500 text-sm mt-1">{errors.nombreLiga}</p>}
             </div>
 
-            {/* Rango de edad
-            <div>
-              <input
-                type='text'
-                name="rangoEdad"
-                value={formData.rangoEdad}
-                onChange={handleInputChange}
-                placeholder="Rango de edad"
-                className={`border p-2 w-full rounded-2xl ${errors.rangoEdad ? 'border-red-500' : 'border-gray-300'}`}
-              />
-              {errors.rangoEdad && <p className="text-red-500 text-sm mt-1">{errors.rangoEdad}</p>}
-            </div>
-            */}
+            {/* Rango de edad*/}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Rango de Edad
@@ -427,7 +415,8 @@ export default function AltaJugador() {
               />
               {errors.contactoPresidente && <p className="text-red-500 text-sm mt-1">{errors.contactoPresidente}</p>}
             </div>
-
+            
+            {/*Cargar imagen*/}
             <ImageUpload
               label="Logo de la Liga (Opcional)"
               name="logoEquipoImg"

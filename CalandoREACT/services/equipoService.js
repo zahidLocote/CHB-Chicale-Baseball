@@ -6,7 +6,6 @@ export async function crearEquipo({ nombre, entrenador, logo, ligaId }) {
     ligaId: Number(ligaId)
   }
 
-
   const res = await fetch('/api/equipos', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
