@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -31,4 +32,35 @@ model equipo{
   logo String?
   ligaId Int?
   liga Liga?   @relation(fields: [ligaId], references: [id])
+  jugadores jugador[]
+}
+
+model jugador {
+  id              Int       @id @default(autoincrement())
+  nombre          String
+  apellidoPaterno String
+  apellidoMaterno String?   @default("N/A")
+  fechaNacimiento DateTime
+  numero          Int
+  posicion        Posicion
+  foto            String?   @default("default.png")
+
+  equipo   equipo @relation(fields: [equipoId], references: [id])
+  equipoId Int
+
+  @@unique([equipoId, numero]) // No permitir dos jugadores con mismo número en un equipo
+}
+
+enum Posicion {
+  P    // Pitcher
+  C    // Catcher
+  PrimeraBase  // Primera Base
+  SegundaBase // Segunda Base
+  TerceraBase  // Tercera Base
+  SS   // Shortstop
+  LF   // Left Field
+  CF   // Center Field
+  RF   // Right Field
+  DH   // Designated Hitter (Bateador Designado)
+  SUB  // Suplente
 }
