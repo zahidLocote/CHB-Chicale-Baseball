@@ -27,3 +27,9 @@ export async function obtenerEquipos() {
   return await res.json()
 }
 
+export async function obtenerEquipoPorId(id) {
+  const res = await fetch(`http://localhost:3001/equipos/${id}`)
+  if (!res.ok) throw new Error('Error al obtener equipo')
+  return await res.json()
+}
+

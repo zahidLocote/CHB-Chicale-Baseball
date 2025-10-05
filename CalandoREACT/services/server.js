@@ -34,6 +34,25 @@ app.get('/equipos', async (req, res) => {
   res.json(equipos)
 })
 
+app.get('/equipos/:id', async (req, res) => {
+  const id = Number(req.params.id)
+
+  try {
+    const equipo = await prisma.equipo.findUnique({
+      where: { id }
+    })
+
+    if (!equipo) {
+      return res.status(404).json({ error: 'Equipo no encontrado' })
+    }
+
+    res.json(equipo)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al obtener equipo' })
+  }
+})
+
 app.get('/ligas', async (req, res) => {
   const ligas = await prisma.liga.findMany()
   res.json(ligas)
