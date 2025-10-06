@@ -10,6 +10,7 @@ const prisma = new PrismaClient()
 app.use(cors())
 app.use(express.json())
 
+// Agregar equipo
 app.post('/equipos', async (req, res) => {
   const { nombre, entrenador, logo, ligaId } = req.body
 
@@ -29,11 +30,13 @@ app.post('/equipos', async (req, res) => {
   }
 })
 
+// Obtener equipos
 app.get('/equipos', async (req, res) => {
   const equipos = await prisma.equipo.findMany()
   res.json(equipos)
 })
 
+// Obtener equipo por id
 app.get('/equipos/:id', async (req, res) => {
   const id = Number(req.params.id)
 
@@ -53,9 +56,34 @@ app.get('/equipos/:id', async (req, res) => {
   }
 })
 
+// Obtener ligas
 app.get('/ligas', async (req, res) => {
   const ligas = await prisma.liga.findMany()
   res.json(ligas)
+})
+
+// Eliminar equipo
+app.delete('/equipos/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  try {
+    await prisma.equipo.delete({ where: { id } })
+    res.json({ mensaje: 'Equipo eliminado correctamente' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al eliminar equipo' })
+  }
+})
+
+// Eliminar liga
+app.delete('/ligas/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  try {
+    await prisma.liga.delete({ where: { id } })
+    res.json({ mensaje: 'Liga eliminada correctamente' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al eliminar liga' })
+  }
 })
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))

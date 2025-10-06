@@ -33,3 +33,17 @@ export async function obtenerEquipoPorId(id) {
   return await res.json()
 }
 
+export async function eliminarEquipo(id) {
+  const res = await fetch(`http://localhost:3001/equipos/${id}`, {
+    method: 'DELETE'
+  })
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error al eliminar equipo')
+  }
+
+  return await res.json()
+}
+
+
