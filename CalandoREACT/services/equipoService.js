@@ -46,4 +46,19 @@ export async function eliminarEquipo(id) {
   return await res.json()
 }
 
+export async function editarEquipo(id, datosActualizados) {
+  const res = await fetch(`http://localhost:3001/equipos/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datosActualizados)
+  })
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error al editar equipo')
+  }
+
+  return await res.json()
+}
+
 

@@ -21,7 +21,7 @@ app.post('/equipos', async (req, res) => {
         entrenador,
         logo,
         liga: ligaId ? { connect: { id: ligaId } } : undefined
-    }
+      }
     })
     res.json(nuevoEquipo)
   } catch (error) {
@@ -83,6 +83,30 @@ app.delete('/ligas/:id', async (req, res) => {
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Error al eliminar liga' })
+  }
+})
+
+// Editar Equipo
+app.put('/equipos/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  const { nombre, entrenador, logo, ligaId } = req.body
+
+  try {
+    console.log('Datos recibidos:', { nombre, entrenador, logo, ligaId })
+    const equipoActualizado = await prisma.equipo.update({
+      where: { id },
+      data: {
+        nombre,
+        entrenador,
+        logo,
+        liga: ligaId ? { connect: { id: Number(ligaId) } } : undefined
+      }
+
+    })
+    res.json(equipoActualizado)
+  } catch (error) {
+    console.error('Error al editar equipo:', error)
+    res.status(500).json({ error: 'No se pudo editar el equipo' })
   }
 })
 

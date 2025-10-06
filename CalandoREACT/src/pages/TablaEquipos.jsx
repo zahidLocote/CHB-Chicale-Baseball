@@ -37,7 +37,7 @@ export default function TablaEquipos() {
             <InfoCard
               data={equipo}
               tipo="equipo"
-              onVer={() => navigate(`/equipos/${equipo.id}`)}
+              onVer={() => navigate(`/equipos/editar/${equipo.id}`)}
               onEliminar={() => handleEliminar(equipo.id)}
             />
 
