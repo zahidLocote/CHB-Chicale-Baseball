@@ -1,26 +1,33 @@
-import { useEffect, useState } from 'react'
-import { Header } from "../components/UI/Header"
-import { obtenerEquipos } from '../../services/equipoService'
-import TablaEquipos from './TablaEquipos'
+import { useEffect,useState } from "react";
+import  InfoCard  from '../components/UI/InfoCard'
+import { obtenerLigas } from '../../services/ligaService'
 
-function VentanaPrincipal() {
-  const [equipos, setEquipos] = useState([])
+export default function VentanaPrincipal(){
+    const [ligas, setLigas] = useState([])
 
-  useEffect(() => {
-    obtenerEquipos()
-      .then(data => setEquipos(data))
-      .catch(error => console.error(error))
-  }, [])
+    useEffect(() => {
+        const cargarLigas = async () => {
+            try {
+                const data = await obtenerLigas()              
+                setLigas(data)
+            } catch (error) {
+                console.error('Error al cargar ligas:', error)
+            }
+        }
+        cargarLigas()
+    }, [])
+    
+    return(
+        <>
+            <h1 className="text-center text-3xl mb-6">Consulta de Ligas</h1>
 
-  return (
-    <>
-      <Header />
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Equipos registrados</h1>
-        <TablaEquipos/>
-      </div>
-    </>
-  )
+            <div className="grid grid-cols-4 gap-6 p-4">
+                {ligas.map(liga => (
+                    <InfoCard key={liga.id} liga={liga} />
+                ))}
+            </div>
+
+        </>
+    )
 }
 
-export default VentanaPrincipal

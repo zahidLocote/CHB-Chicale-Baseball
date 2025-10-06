@@ -1,8 +1,11 @@
 import { Routes, Route } from 'react-router-dom'
+
 import VentanaPrincipal from './pages/VentanaPrincipal'
 import DetalleEquipo from './pages/DetalleEquipo'
 import AltaEquipos from './pages/AltaEquipos'
 import EditarEquipo from './pages/EditarEquipo'
+import  AltaLigas  from './pages/AltaLigas'
+
 
 function App() {
   return (
@@ -12,6 +15,7 @@ function App() {
       <Route path='/equipos/nuevo' element={<AltaEquipos/>}/>
       <Route path="/equipos/editar/:id" element={<EditarEquipo />}/>
     </Routes>
+
   )
 }
 

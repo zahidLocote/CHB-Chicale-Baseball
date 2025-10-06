@@ -1,14 +1,14 @@
 import express from 'express'
-import cors from 'cors'
 import dotenv from 'dotenv'
 import { PrismaClient } from '@prisma/client'
 
 dotenv.config()
+
 const app = express()
 const prisma = new PrismaClient()
 
-app.use(cors())
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // Agregar equipo
 app.post('/equipos', async (req, res) => {
@@ -23,10 +23,74 @@ app.post('/equipos', async (req, res) => {
         liga: ligaId ? { connect: { id: ligaId } } : undefined
       }
     })
-    res.json(nuevoEquipo)
+
+    res.json({
+      success: true,
+      message: 'Liga registrada exitosamente',
+      data: nuevaLiga
+    })
+
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al crear el equipo' })
+    console.error('Error al crear liga:', error)
+    res.status(500).json({ 
+      error: 'Error al registrar la liga',
+      details: error.message 
+    })
+  }
+})
+
+// Ruta POST para crear liga
+app.post('/liga', async (req, res) => {
+  try {
+    const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente } = req.body
+
+    console.log('Datos recibidos:', req.body)
+
+    if (!nombreLiga || !categoria || !nombrePresidente || !contactoPresidente) {
+      return res.status(400).json({ 
+        error: 'Todos los campos son obligatorios excepto el logo' 
+      })
+    }
+
+    const edadMinNum = parseInt(edadMin)
+    const edadMaxNum = parseInt(edadMax)
+
+    if (isNaN(edadMinNum) || isNaN(edadMaxNum)) {
+      return res.status(400).json({ 
+        error: 'Las edades deben ser números válidos' 
+      })
+    }
+
+    if (edadMinNum > edadMaxNum) {
+      return res.status(400).json({ 
+        error: 'La edad mínima no puede ser mayor que la edad máxima' 
+      })
+    }
+
+    const nuevaLiga = await prisma.liga.create({
+      data: {
+        nombreLiga,
+        edad_min: edadMinNum,
+        edad_max: edadMaxNum,
+        categoria,
+        nombrePresidente,
+        contactoPresidente,
+        //logoUrl: req.file ? `/uploads/${req.file.filename}` : null
+      }
+    })
+
+    res.json({
+      success: true,
+      message: 'Liga registrada exitosamente',
+      data: nuevaLiga
+    })
+
+  } catch (error) {
+    console.error('Error al crear liga:', error)
+    res.status(500).json({ 
+      error: 'Error al registrar la liga',
+      details: error.message 
+    })
   }
 })
 
@@ -57,8 +121,8 @@ app.get('/equipos/:id', async (req, res) => {
 })
 
 // Obtener ligas
-app.get('/ligas', async (req, res) => {
-  const ligas = await prisma.liga.findMany()
+  app.get('/liga', async (req, res) => {
+    const ligas = await prisma.liga.findMany()
   res.json(ligas)
 })
 
@@ -74,17 +138,6 @@ app.delete('/equipos/:id', async (req, res) => {
   }
 })
 
-// Eliminar liga
-app.delete('/ligas/:id', async (req, res) => {
-  const id = Number(req.params.id)
-  try {
-    await prisma.liga.delete({ where: { id } })
-    res.json({ mensaje: 'Liga eliminada correctamente' })
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al eliminar liga' })
-  }
-})
 
 // Editar Equipo
 app.put('/equipos/:id', async (req, res) => {

@@ -14,7 +14,7 @@ export default function AltaEquipos() {
     const [logo, setLogo] = useState(null)
 
     useEffect(() => {
-        fetch('http://localhost:3001/ligas')
+        fetch('http://localhost:3001/equipo')
             .then(res => res.json())
             .then(data => setLigas(data))
     }, [])
