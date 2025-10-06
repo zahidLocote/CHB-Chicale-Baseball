@@ -4,6 +4,7 @@ import './App.css'
 import { Header } from './components/UI/Header'
 import  AltaLigas  from './pages/AltaLigas'
 import  AltaEquipos  from './pages/AltaEquipos'
+import  VentanaPrincipal from  './pages/VentanaPrincipal'
 
 
 function App() {
@@ -34,6 +35,10 @@ function App() {
       {vista === 'ligas' && <AltaLigas onCancel={() => setVista(null)} />}
       {vista === 'equipos' && <AltaEquipos onCancel={() => setVista(null)} />}
     </div>
+
+    <VentanaPrincipal/>
+
+     
 
     </>
   )

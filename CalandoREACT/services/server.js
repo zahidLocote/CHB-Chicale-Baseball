@@ -7,8 +7,11 @@ dotenv.config()
 const app = express()
 const prisma = new PrismaClient()
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 // Ruta POST para crear liga
-app.post('/liga', upload.single('logoLiga'), async (req, res) => {
+app.post('/liga', async (req, res) => {
   try {
     const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente } = req.body
     
@@ -60,6 +63,11 @@ app.post('/liga', upload.single('logoLiga'), async (req, res) => {
       details: error.message 
     })
   }
+})
+
+app.get('/liga', async (req, res) => {
+  const ligas = await prisma.liga.findMany()
+  res.json(ligas)
 })
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))

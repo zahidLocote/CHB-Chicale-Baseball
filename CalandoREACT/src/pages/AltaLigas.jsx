@@ -22,7 +22,6 @@ export default function AltaJugador() {
    
   const [imagePreview, setImagePreview] = useState(null); // Para mostrar preview de la imagen
 
-
   // Función para validar campos
   const validateForm = () => {
     const newErrors = {};
@@ -32,11 +31,11 @@ export default function AltaJugador() {
       newErrors.nombreLiga = 'El nombre de la liga es obligatorio';
     }
     
-    if (formData.edadMin < 5 || formData.edadMin > 100) {
+    if (formData.edadMin < 1 || formData.edadMin > 100) {
       newErrors.edadMin = 'La edad mínima debe estar entre 5 y 100 años';
     }
     
-    if (formData.edadMax < 5 || formData.edadMax > 100) {
+    if (formData.edadMax < 1 || formData.edadMax > 100) {
       newErrors.edadMax = 'La edad máxima debe estar entre 5 y 100 años';
     }
     
@@ -90,12 +89,12 @@ export default function AltaJugador() {
   };
 
   const decrementAge = (type) => {
-    if (type === 'min' && formData.edadMin > 5) {
+    if (type === 'min' && formData.edadMin > 1) {
       setFormData({
         ...formData,
         edadMin: formData.edadMin - 1
       });
-    } else if (type === 'max' && formData.edadMax > 5) {
+    } else if (type === 'max' && formData.edadMax > 1) {
       setFormData({
         ...formData,
         edadMax: formData.edadMax - 1
@@ -115,16 +114,16 @@ export default function AltaJugador() {
 
   //Función para manejar cambio directo en el input numérico
   const handleAgeInputChange = (type, value) => {
-    const numValue = parseInt(value) || 5;
+    const numValue = parseInt(value) || 1;
     if (type === 'min') {
       setFormData({
         ...formData,
-        edadMin: Math.max(5, Math.min(100, numValue))
+        edadMin: Math.max(1, Math.min(100, numValue))
       });
     } else {
       setFormData({
         ...formData,
-        edadMax: Math.max(5, Math.min(100, numValue))
+        edadMax: Math.max(1, Math.min(100, numValue))
       });
     }
     
@@ -415,7 +414,7 @@ export default function AltaJugador() {
               />
               {errors.contactoPresidente && <p className="text-red-500 text-sm mt-1">{errors.contactoPresidente}</p>}
             </div>
-            
+
             {/*Cargar imagen*/}
             <ImageUpload
               label="Logo de la Liga (Opcional)"
