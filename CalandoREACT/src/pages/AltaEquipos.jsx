@@ -4,7 +4,7 @@ import { crearEquipo } from '../../services/equipoService'
 import PictureBox from '../components/UI/PictureBox'
 import useFormValidation from '../hooks/useFormValidation'
 
-export default function AltaEquipos({ onCancel }) {
+export default function AltaEquipos() {
     const navigate = useNavigate()
     const { validarEquipos } = useFormValidation()
     const [nombre, setNombre] = useState('')
@@ -32,6 +32,7 @@ export default function AltaEquipos({ onCancel }) {
             setEntrenador('')
             setLogo(null)
             alert('Equipo registrado exitosamente')
+            navigate('/')
         }catch(error){
             console.error(error)
         }
@@ -73,7 +74,7 @@ export default function AltaEquipos({ onCancel }) {
                         <button
                             type="button"
                             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-pink-700"
-                            onClick={onCancel}
+                            onClick={() => navigate('/')}
                         >
                             CANCELAR
                         </button>

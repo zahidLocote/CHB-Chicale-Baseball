@@ -16,3 +16,49 @@ export async function crearEquipo({ nombre, entrenador, logo, ligaId }) {
   if (!res.ok) throw new Error('Error al crear equipo')
   return await res.json()
 }
+
+export async function obtenerEquipos() {
+  const res = await fetch('http://localhost:3001/equipos')
+
+  if (!res.ok) {
+    throw new Error('Error al obtener equipos')
+  }
+
+  return await res.json()
+}
+
+export async function obtenerEquipoPorId(id) {
+  const res = await fetch(`http://localhost:3001/equipos/${id}`)
+  if (!res.ok) throw new Error('Error al obtener equipo')
+  return await res.json()
+}
+
+export async function eliminarEquipo(id) {
+  const res = await fetch(`http://localhost:3001/equipos/${id}`, {
+    method: 'DELETE'
+  })
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error al eliminar equipo')
+  }
+
+  return await res.json()
+}
+
+export async function editarEquipo(id, datosActualizados) {
+  const res = await fetch(`http://localhost:3001/equipos/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datosActualizados)
+  })
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error al editar equipo')
+  }
+
+  return await res.json()
+}
+
+
