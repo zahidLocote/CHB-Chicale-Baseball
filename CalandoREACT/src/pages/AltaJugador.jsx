@@ -1,7 +1,8 @@
 import { useState } from "react";
 import defaultPlayer from '../assets/picture.jpg';
+import { crearJugador } from '../../services/jugadorService';
 
-export default function AltaJugadorModal({ equipoId, onClose }) {
+export default function AltaJugador({ equipoId, onClose }) {
   const [form, setForm] = useState({
     nombre: "",
     apellidoPaterno: "",
@@ -29,28 +30,30 @@ export default function AltaJugadorModal({ equipoId, onClose }) {
       const confirmar = window.confirm("Hay datos llenados. ¿Seguro que deseas cancelar?");
       if (!confirmar) return;
     }
-    onClose(); // Cierra el modal
+    onClose();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = new FormData();
-    Object.keys(form).forEach((key) => {
-      data.append(key, form[key]);
-    });
-    data.append("equipoId", equipoId);
+
+    const jugador = {
+      nombre: form.nombre,
+      apellidoPaterno: form.apellidoPaterno,
+      apellidoMaterno: form.apellidoMaterno || "N/A",
+      fechaNacimiento: form.fechaNacimiento,
+      numero: parseInt(form.numero),
+      posicion: form.posicion,
+      foto: null,
+      equipoId: equipoId
+    };
 
     try {
-      const res = await fetch("http://localhost:3001/api/jugadores", {
-        method: "POST",
-        body: data,
-      });
-      const result = await res.json();
+      const result = await crearJugador(jugador);
       alert(result.message);
       onClose();
     } catch (error) {
       console.error(error);
-      alert("Error al registrar jugador");
+      alert(error.message || "Error al registrar jugador");
     }
   };
 
@@ -71,9 +74,9 @@ export default function AltaJugadorModal({ equipoId, onClose }) {
               <option value="">Posición</option>
               <option value="P">Pitcher</option>
               <option value="C">Catcher</option>
-              <option value="_1B">Primera Base</option>
-              <option value="_2B">Segunda Base</option>
-              <option value="_3B">Tercera Base</option>
+              <option value="PrimeraBase">Primera Base</option>
+              <option value="SegundaBase">Segunda Base</option>
+              <option value="TerceraBase">Tercera Base</option>
               <option value="SS">Shortstop</option>
               <option value="LF">Jardinero Izquierdo</option>
               <option value="CF">Jardinero Central</option>
