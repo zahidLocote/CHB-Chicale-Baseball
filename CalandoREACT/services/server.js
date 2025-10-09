@@ -1,6 +1,9 @@
 import express from 'express'
 import dotenv from 'dotenv'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from './generated/prisma/index.js'
+
+
+
 
 dotenv.config()
 
@@ -162,5 +165,40 @@ app.put('/equipos/:id', async (req, res) => {
     res.status(500).json({ error: 'No se pudo editar el equipo' })
   }
 })
+// Alta Jugador
+app.post('/api/jugadores', async (req, res) => {
+  const {
+    nombre,
+    apellidoPaterno,
+    apellidoMaterno,
+    fechaNacimiento,
+    numero,
+    posicion,
+    foto,
+    equipoId
+  } = req.body;
+
+  try {
+    const nuevoJugador = await prisma.jugador.create({
+      data: {
+        nombre,
+        apellidoPaterno,
+        apellidoMaterno: apellidoMaterno || "N/A",
+        fechaNacimiento: new Date(fechaNacimiento),
+        numero: parseInt(numero),
+        posicion,
+        foto,
+        equipo: { connect: { id: parseInt(equipoId) } }
+      }
+    });
+
+    res.json({ message: "Jugador registrado exitosamente", jugador: nuevoJugador });
+  } catch (error) {
+    console.error("Error al registrar jugador:", error);
+    res.status(500).json({ message: "Error al registrar jugador" });
+  }
+});
+
+
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))

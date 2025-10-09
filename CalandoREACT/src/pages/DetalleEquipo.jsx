@@ -2,10 +2,12 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { obtenerEquipoPorId } from '../../services/equipoService'
 import placeholderfoto from '../assets/placeholderfoto.jpg'
+import AltaJugador from './AltaJugador'
 
 export default function DetalleEquipo() {
   const { id } = useParams()
   const [equipo, setEquipo] = useState(null)
+  const [mostrarModal, setMostrarModal] = useState(false)
 
   useEffect(() => {
     obtenerEquipoPorId(id)
@@ -32,7 +34,20 @@ export default function DetalleEquipo() {
         <button className="bg-red-300 text-red-700 font-bold px-4 py-2 rounded-xl hover:bg-red-200">
           Eliminar
         </button>
+        <button
+          className="bg-green-300 text-green-700 font-bold px-4 py-2 rounded-xl hover:bg-green-200"
+          onClick={() => setMostrarModal(true)}
+        >
+          Agregar Jugador
+        </button>
       </div>
+
+      {mostrarModal && (
+        <AltaJugador
+          equipoId={equipo.id}
+          onClose={() => setMostrarModal(false)}
+        />
+      )}
     </div>
   )
 }

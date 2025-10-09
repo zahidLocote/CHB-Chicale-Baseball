@@ -1,6 +1,10 @@
 import { useEffect,useState } from "react";
 import  InfoCard  from '../components/UI/InfoCard'
 import { obtenerLigas } from '../../services/ligaService'
+import { Header } from "../components/UI/Header"
+import { obtenerEquipos } from '../../services/equipoService'
+import TablaEquipos from './TablaEquipos'
+
 
 export default function VentanaPrincipal(){
     const [ligas, setLigas] = useState([])
