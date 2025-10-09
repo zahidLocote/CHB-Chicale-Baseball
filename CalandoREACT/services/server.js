@@ -2,6 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import { PrismaClient } from '@prisma/client'
 
+
 dotenv.config()
 
 const app = express()
@@ -126,31 +127,6 @@ app.get('/equipos/:id', async (req, res) => {
   res.json(ligas)
 })
 
-//Editar por id Ligas
-app.put('/liga/:id', async (req, res) => {
-  const id = Number(req.params.id)
-  const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente } = req.body
-
-  try {
-    console.log('Datos recibidos:', { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente })
-    const ligaActualizada = await prisma.liga.update({
-      where: { id },
-      data: {
-        nombreLiga,
-        edad_min,
-        edad_max,
-        categoria,
-        nombrePresidente,
-        contactoPresidente
-      }
-
-    })
-    res.json(ligaActualizada)
-  } catch (error) {
-    console.error('Error al editar liga:', error)
-    res.status(500).json({ error: 'No se pudo editar la liga' })
-  }
-})
 
 //Obtener liga por id
 app.get('/liga/:id', async (req, res) => {
@@ -169,7 +145,7 @@ app.get('/liga/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener liga' });
   }
 });
-
+1
 
 // Eliminar equipo
 app.delete('/equipos/:id', async (req, res) => {
@@ -202,6 +178,32 @@ app.put('/equipos/:id', async (req, res) => {
 
     })
     res.json(equipoActualizado)
+  } catch (error) {
+    console.error('Error al editar equipo:', error)
+    res.status(500).json({ error: 'No se pudo editar el equipo' })
+  }
+})
+
+//Editar ligas
+app.put('/liga/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente  } = req.body
+
+  try {
+    console.log('Datos recibidos:', { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente  })
+    const ligaActualizada = await prisma.liga.update({
+      where: { id },
+      data: {
+        nombreLiga,
+        edad_min: edadMin,
+        edad_max: edadMax,
+        categoria,
+        nombrePresidente,
+        contactoPresidente,
+      }
+
+    })
+    res.json(ligaActualizadas)
   } catch (error) {
     console.error('Error al editar equipo:', error)
     res.status(500).json({ error: 'No se pudo editar el equipo' })

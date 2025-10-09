@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { AlertaPopUp } from '../components/UI/AlertaPopUp';
 import { ImageUpload } from '../components/UI/ImageUpload';
 import { registrarLiga } from '../../services/ligaService';
-
-
+import { ligaFormValidation } from '../hooks/ligaFormValidation';  // ← Importar hook
 
 export default function AltaJugador() {
+  const { errors, validarFormularioLiga, limpiarError, limpiarErrores } = ligaFormValidation();  // ← Usar hook
+  
   const [formData, setFormData] = useState({
     nombreLiga: '',
     edadMin: 0,
@@ -15,55 +16,16 @@ export default function AltaJugador() {
     contactoPresidente: '',
     logoLiga: null
   });
-
-  const [errors, setErrors] = useState({});
   
   const [showPopup, setShowPopup] = useState(false); 
-   
-  const [imagePreview, setImagePreview] = useState(null); // Para mostrar preview de la imagen
+  const [popupConfig, setPopupConfig] = useState({
+    title: '',
+    message: '',
+    type: 'error'
+  });
+  const [imagePreview, setImagePreview] = useState(null);
 
-  // Función para validar campos
-  const validateForm = () => {
-    const newErrors = {};
-
-    // Validar cada campo (eliminar espacios y verificar si está vacío)
-    if (!formData.nombreLiga.trim()) {
-      newErrors.nombreLiga = 'El nombre de la liga es obligatorio';
-    }
-    
-    if (formData.edadMin < 1 || formData.edadMin > 100) {
-      newErrors.edadMin = 'La edad mínima debe estar entre 5 y 100 años';
-    }
-    
-    if (formData.edadMax < 1 || formData.edadMax > 100) {
-      newErrors.edadMax = 'La edad máxima debe estar entre 5 y 100 años';
-    }
-    
-    if (formData.edadMin > formData.edadMax) {
-      newErrors.rangoEdad = 'La edad mínima no puede ser mayor que la edad máxima';
-    }
-    
-    if (!formData.categoria.trim()) {
-      newErrors.categoria = 'La categoría es obligatoria';
-    }
-    
-    if (!formData.categoria.trim()) {
-      newErrors.categoria = 'La categoría es obligatoria';
-    }
-    
-    if (!formData.nombrePresidente.trim()) {
-      newErrors.nombrePresidente = 'El nombre del presidente es obligatorio';
-    }
-    
-    if (!formData.contactoPresidente.trim()) {
-      newErrors.contactoPresidente = 'El contacto del presidente es obligatorio';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-   //Funciones para manejar los number pickers
+  // Funciones para manejar los number pickers
   const incrementAge = (type) => {
     if (type === 'min' && formData.edadMin < 100) {
       setFormData({
@@ -76,16 +38,7 @@ export default function AltaJugador() {
         edadMax: formData.edadMax + 1
       });
     }
-    
-    // Limpiar errores relacionados con edad
-    if (errors.edadMin || errors.edadMax || errors.rangoEdad) {
-      setErrors({
-        ...errors,
-        edadMin: '',
-        edadMax: '',
-        rangoEdad: ''
-      });
-    }
+    limpiarError('rangoEdad');  // ← Usar función del hook
   };
 
   const decrementAge = (type) => {
@@ -100,19 +53,9 @@ export default function AltaJugador() {
         edadMax: formData.edadMax - 1
       });
     }
-    
-    // Limpiar errores relacionados con edad
-    if (errors.edadMin || errors.edadMax || errors.rangoEdad) {
-      setErrors({
-        ...errors,
-        edadMin: '',
-        edadMax: '',
-        rangoEdad: ''
-      });
-    }
+    limpiarError('rangoEdad');  // ← Usar función del hook
   };
 
-  //Función para manejar cambio directo en el input numérico
   const handleAgeInputChange = (type, value) => {
     const numValue = parseInt(value) || 1;
     if (type === 'min') {
@@ -126,63 +69,30 @@ export default function AltaJugador() {
         edadMax: Math.max(1, Math.min(100, numValue))
       });
     }
-    
-    // Limpiar errores relacionados con edad
-    if (errors.edadMin || errors.edadMax || errors.rangoEdad) {
-      setErrors({
-        ...errors,
-        edadMin: '',
-        edadMax: '',
-        rangoEdad: ''
-      });
-    }
+    limpiarError('rangoEdad');  // ← Usar función del hook
   };
 
-  // Manejar cambios en los inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value
     });
-    
-    // Limpiar error del campo cuando el usuario empieza a escribir
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: ''
-      });
-    }
+    limpiarError(name);  // ← Usar función del hook
   };
 
-  // Manejar cambios en el input de archivo
   const handleImageChange = (file, error, preview) => {
     if (error) {
-      // Si hay un error, actualizarlo en el estado de errores
-      setErrors({
-        ...errors,
-        logoLiga: error
-      });
       return;
     }
 
-    // Si todo está bien, guardar el archivo y el preview
     setFormData({
       ...formData,
       logoLiga: file
     });
     setImagePreview(preview);
-
-    // Limpiar error si existía
-    if (errors.logoLiga) {
-      setErrors({
-        ...errors,
-        logoLiga: ''
-      });
-    }
   };
 
-  // Función para remover la imagen
   const handleImageRemove = () => {
     setFormData({
       ...formData,
@@ -191,62 +101,71 @@ export default function AltaJugador() {
     setImagePreview(null);
   };
 
-  // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (validateForm()) {
-      /* (zahid): ESTO ES NECESARIO PARA ARCHIVOS (USAR FormData)
-      const formDataToSend = new FormData();
-      formDataToSend.append('nombreLiga', formData.nombreLiga.trim());
-      // MODIFICACIÓN 5: Cambié el envío del rango de edad
-      formDataToSend.append('edadMin', formData.edadMin.toString());
-      formDataToSend.append('edadMax', formData.edadMax.toString());
-      formDataToSend.append('categoria', formData.categoria.trim());
-      formDataToSend.append('nombrePresidente', formData.nombrePresidente.trim());
-      formDataToSend.append('contactoPresidente', formData.contactoPresidente.trim());
-      
-      if (formData.logoLiga) {
-        formDataToSend.append('logoLiga', formData.logoLiga);
+    // ← Usar validación del hook
+    const esValido = validarFormularioLiga({
+      nombreLiga: formData.nombreLiga,
+      edadMin: formData.edadMin,
+      edadMax: formData.edadMax,
+      categoria: formData.categoria,
+      nombrePresidente: formData.nombrePresidente,
+      contactoPresidente: formData.contactoPresidente
+    });
+
+    if (esValido) {
+      try {
+        const ligaInformacion = {
+          nombreLiga: formData.nombreLiga.trim(),
+          edadMin: formData.edadMin,
+          edadMax: formData.edadMax,
+          categoria: formData.categoria.trim(),
+          nombrePresidente: formData.nombrePresidente.trim(),
+          contactoPresidente: formData.contactoPresidente.trim()
+        };
+        
+        await registrarLiga(ligaInformacion);
+        
+        // Mostrar popup de éxito
+        setPopupConfig({
+          title: '¡Éxito!',
+          message: 'El registro de la liga se ha completado exitosamente.',
+          type: 'success'
+        });
+        setShowPopup(true);
+        
+        // Resetear formulario
+        setFormData({
+          nombreLiga: '',
+          edadMin: 0,
+          edadMax: 0,
+          categoria: '',
+          nombrePresidente: '',
+          contactoPresidente: '',
+          logoLiga: null
+        });
+        setImagePreview(null);
+      } catch (error) {
+        console.error('Error al registrar:', error);
+        setPopupConfig({
+          title: 'Error',
+          message: 'No se pudo registrar la liga. Intenta nuevamente.',
+          type: 'error'
+        });
+        setShowPopup(true);
       }
-      //Check
-      for (let pair of formDataToSend.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-      console.log(formDataToSend)
-      */
-      //Temporal hasta que se usen archivos (preparar la API)
-      const ligaInformacion = {
-        nombreLiga: formData.nombreLiga.trim(),
-        edadMin: formData.edadMin,
-        edadMax: formData.edadMax,
-        categoria: formData.categoria.trim(),
-        nombrePresidente: formData.nombrePresidente.trim(),
-        contactoPresidente: formData.contactoPresidente.trim()
-      };
-      const response = await registrarLiga(ligaInformacion);
-      
-      // Mostrar popup de éxito
-      setShowPopup(true);
-      
-      // Resetear formulario
-      setFormData({
-        nombreLiga: '',
-        edadMin: 0,
-        edadMax: 0,
-        categoria: '',
-        nombrePresidente: '',
-        contactoPresidente: '',
-        logoLiga: null
-      });
-      setImagePreview(null);
     } else {
-      // Mostrar popup de error
+      // Mostrar popup de error con validaciones
+      setPopupConfig({
+        title: 'Campos Obligatorios',
+        message: null,  // Se usarán los errors del hook
+        type: 'error'
+      });
       setShowPopup(true);
     }
   };
 
-  // Manejar cancelación
   const handleCancel = () => {
     setFormData({
       nombreLiga: '',
@@ -257,26 +176,27 @@ export default function AltaJugador() {
       contactoPresidente: '',
       logoLiga: null
     });
-    setErrors({});
+    limpiarErrores();  // ← Usar función del hook
+    setImagePreview(null);
   };
 
-  // Cerrar popup 
   const handleClosePopup = () => {
     setShowPopup(false);
-    setErrors({});
+    if (popupConfig.type !== 'success') {
+      limpiarErrores();  // ← Solo limpiar si no es éxito
+    }
   };
 
   return (
     <>
-      
       {/* Popup de alerta */}
       <AlertaPopUp
         show={showPopup}
         onClose={handleClosePopup}
-        title={Object.keys(errors).length > 0 ? "Campos Obligatorios" : "¡Éxito!"}
-        message={Object.keys(errors).length === 0 ? "El registro de la liga se ha completado exitosamente." : null}
-        type={Object.keys(errors).length > 0 ? "error" : "success"}
-        errors={errors}
+        title={popupConfig.title}
+        message={popupConfig.message}
+        type={popupConfig.type}
+        errors={errors}  // ← Pasar errors del hook
       />
 
       <div className="flex flex-col items-center min-h-screen bg-gray-50">
@@ -321,7 +241,7 @@ export default function AltaJugador() {
                       value={formData.edadMin}
                       onChange={(e) => handleAgeInputChange('min', e.target.value)}
                       className="w-12 h-8 text-center border-0 focus:outline-none"
-                      min="5"
+                      min="1"
                       max="100"
                     />
                     <button
@@ -334,7 +254,6 @@ export default function AltaJugador() {
                   </div>
                 </div>
 
-                {/* Separador "A:" */}
                 <div className="text-xl font-bold text-gray-700 pt-6">
                   A:
                 </div>
@@ -355,7 +274,7 @@ export default function AltaJugador() {
                       value={formData.edadMax}
                       onChange={(e) => handleAgeInputChange('max', e.target.value)}
                       className="w-12 h-8 text-center border-0 focus:outline-none"
-                      min="5"
+                      min="1"
                       max="100"
                     />
                     <button
@@ -370,11 +289,8 @@ export default function AltaJugador() {
               </div>
               
               {/* Mensajes de error para el rango de edad */}
-              {errors.edadMin && <p className="text-red-500 text-sm mt-1">{errors.edadMin}</p>}
-              {errors.edadMax && <p className="text-red-500 text-sm mt-1">{errors.edadMax}</p>}
               {errors.rangoEdad && <p className="text-red-500 text-sm mt-1">{errors.rangoEdad}</p>}
             </div>
-
 
             {/* Categoría */}
             <div>
@@ -428,13 +344,13 @@ export default function AltaJugador() {
               acceptedTypes={['image/jpeg', 'image/jpg', 'image/png']}
               placeholder="Click para subir tu logo"
               helpText="PNG y JPG"
-              size = "w-full"
+              size="w-full"
             />     
 
             {/* Contenedor de botones */}
             <div className="flex justify-between">
               <button
-              name='cancelarBtn'
+                name='cancelarBtn'
                 type="button"
                 onClick={handleCancel}
                 className="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-800"

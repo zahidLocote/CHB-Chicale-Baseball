@@ -13,7 +13,7 @@ function App() {
     <>
     <Routes>
       <Route path="/" element={<VentanaPrincipal />} />
-      <Route path="/editar-liga/:id" element={<EditarLiga />} />  {/* ← Agregar esta ruta */}
+      <Route path="/editar-liga/:id" element={<EditarLiga />} />
       <Route path="/equipos/:id" element={<DetalleEquipo />} />
       <Route path='/equipos/nuevo' element={<AltaEquipos/>}/>
       <Route path="/equipos/editar/:id" element={<EditarEquipo />}/>

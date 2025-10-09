@@ -1,127 +1,206 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from 'react-router-dom';  // ← Agregar useNavigate
+import { useParams, useNavigate } from 'react-router-dom';
 import { ImageUpload } from "../components/UI/ImageUpload";
 import { obtenerLigaPorId } from "../../services/ligaService";
+import { ligaFormValidation } from "../hooks/ligaFormValidation";
+import { AlertaPopUp } from "../components/UI/AlertaPopUp";
+import { editarLigas } from "../../services/ligaService";
 
-export default function EditarLiga(){
+
+
+export default function EditarLiga() {
     const { id } = useParams();
-    const navigate = useNavigate();  // ← Agregar esto
-
-    
-    const [informacion, setInformacion] = useState({
-        nombreLiga: '',
-        edadMin: 0,
-        edadMax: 0,
-        categoria: '',
-        nombrePresidente: '',
-        contactoPresidente: '',
-        logoLiga: null
+    const navigate = useNavigate();
+    const { errors, validarFormularioLiga, limpiarError, limpiarErrores } = ligaFormValidation()  // ← Usar hook
+    // Estados para el popup
+    const [showPopup, setShowPopup] = useState(false);  // ← Agregar
+    const [popupConfig, setPopupConfig] = useState({    // ← Agregar
+        title: '',
+        message: '',
+        type: 'error'
     });
+
+
+
+    const [nombreLiga, setNombreLiga] = useState('');
+    const [edadMin, setEdadMin] = useState(1);
+    const [edadMax, setEdadMax] = useState(1);
+    const [categoria, setCategoria] = useState('');
+    const [nombrePresidente, setNombrePresidente] = useState('');
+    const [contactoPresidente, setContactoPresidente] = useState('');
+    const [imagePreview, setImagePreview] = useState(null);
+    const [logoLiga, setLogoLiga] = useState(null);
 
     useEffect(() => {
   const cargarLiga = async () => {
     try {
-      const datos = await obtenerLigaPorId(id);
-
-      setInformacion({
-        nombreLiga: datos.nombreLiga || '',
-        edadMin: datos.edad_min || 0,
-        edadMax: datos.edad_max || 0,
-        categoria: datos.categoria || '',
-        nombrePresidente: datos.nombrePresidente || '',
-        contactoPresidente: datos.contactoPresidente || '',
-        logoLiga: null
-      });
+      const liga = await obtenerLigaPorId(id);
+      
+      setNombreLiga(liga.nombreLiga);
+      setEdadMin(liga.edad_min);
+      setEdadMax(liga.edad_max);
+      setCategoria(liga.categoria);
+      setNombrePresidente(liga.nombrePresidente);
+      setContactoPresidente(liga.contactoPresidente);
+      setImagePreview(liga.logoUrl || null); // si tienes logo
+      
     } catch (error) {
-      console.error("Error al cargar liga:", error);
+      console.error('Error al cargar la liga:', error);
+      // Mostrar error con popup
+                
+      setPopupConfig({
+        title: 'Error',            
+        message: 'No se pudo cargar la información de la liga',
+        type: 'error'
+                
+    });
+    setShowPopup(true);
     }
   };
 
-  cargarLiga();
+  if (id) cargarLiga();
 }, [id]);
 
 
-    const [imagePreview, setImagePreview] = useState(null);
 
+    // Incrementar edad
     const incrementAge = (type) => {
-        if (type === 'min' && informacion.edadMin < 100) {
-            setInformacion({
-                ...informacion,
-                edadMin: informacion.edadMin + 1
-            });
-        } else if (type === 'max' && informacion.edadMax < 100) {
-            setInformacion({
-                ...informacion,
-                edadMax: informacion.edadMax + 1
-            });
-        }
+        if (type === 'min' && edadMin < 100) setEdadMin(edadMin + 1);
+        else if (type === 'max' && edadMax < 100) setEdadMax(edadMax + 1);
+        limpiarError('rangoEdad');
     };
 
+    // Decrementar edad
     const decrementAge = (type) => {
-        if (type === 'min' && informacion.edadMin > 1) {
-            setInformacion({
-                ...informacion,
-                edadMin: informacion.edadMin - 1
-            });
-        } else if (type === 'max' && informacion.edadMax > 1) {
-            setInformacion({
-                ...informacion,
-                edadMax: informacion.edadMax - 1
-            });
-        }
+        if (type === 'min' && edadMin > 1) setEdadMin(edadMin - 1);
+        else if (type === 'max' && edadMax > 1) setEdadMax(edadMax - 1);
+        limpiarError('rangoEdad');
     };
 
+    // Cambiar edad por input
     const handleAgeInputChange = (type, value) => {
         const numValue = parseInt(value) || 1;
-        if (type === 'min') {
-            setInformacion({
-                ...informacion,
-                edadMin: Math.max(1, Math.min(100, numValue))
-            });
-        } else {
-            setInformacion({
-                ...informacion,
-                edadMax: Math.max(1, Math.min(100, numValue))
-            });
+        if (type === 'min') setEdadMin(Math.max(1, Math.min(100, numValue)));
+        else setEdadMax(Math.max(1, Math.min(100, numValue)));
+         limpiarError('rangoEdad');
+    };
+
+    // Cambiar valores de texto
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        switch (name) {
+            case 'nombreLiga': setNombreLiga(value); 
+            limpiarError('nombreLiga');
+            break;
+            case 'categoria': setCategoria(value); 
+            limpiarError('categoria');
+            break;
+            case 'nombrePresidente': setNombrePresidente(value);
+            limpiarError('nombrePresidente');
+            break;
+            case 'contactoPresidente': 
+            setContactoPresidente(value);
+            limpiarError('contactoPresidente');
+            break;
+            default: break;
         }
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setInformacion({
-            ...informacion,
-            [name]: value
-        });
-    };
-
+    // Imagen
     const handleImageChange = (file, error, preview) => {
         if (error) return;
-        setInformacion({ ...informacion, logoLiga: file });
+        setLogoLiga(file);
         setImagePreview(preview);
     };
 
     const handleImageRemove = () => {
-        setInformacion({ ...informacion, logoLiga: null });
+        setLogoLiga(null);
         setImagePreview(null);
     };
 
+    // Cancelar
     const handleCancelar = () => {
-        navigate(-1);  // ← Agregar esta función
+        navigate('/');
     };
 
-    return(
+    const handleClosePopup = () => {
+        setShowPopup(false);
+        limpiarErrores();
+        
+        // Si fue éxito, regresar a la página anterior
+        if (popupConfig.type === 'success') {
+            navigate(-1);
+        }
+    };
+
+    const handleSubmit = async (e) =>{
+        e.preventDefault()
+
+        const esValido = validarFormularioLiga({
+            nombreLiga,
+            edadMin,
+            edadMax,
+            categoria,
+            nombrePresidente,
+            contactoPresidente
+        });
+
+        if (!esValido) {
+            // Mostrar errores en popup
+            setPopupConfig({
+                title: 'Campos Obligatorios',
+                message: null,  // Se generará desde errors
+                type: 'error'
+            });
+            setShowPopup(true);
+            return;
+        }
+
+         console.log('Formulario válido, enviando...');
+        try {
+            // Aquí harías la actualización a la API
+
+            await editarLigas(id, {nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente})
+            setPopupConfig({
+                title: '¡Éxito!',
+                message: 'La liga se ha actualizado correctamente',
+                type: 'success'
+            });
+            setShowPopup(true);
+        } catch (error) {
+            console.error('Error al actualizar:', error);
+            setPopupConfig({
+                title: 'Error',
+                message: 'No se pudo actualizar la liga. Intenta nuevamente.',
+                type: 'error'
+            });
+            setShowPopup(true);
+        }
+
+    }
+
+    return (
         <>
+        {/* Popup de alerta */}
+            <AlertaPopUp
+                show={showPopup}
+                onClose={handleClosePopup}
+                title={popupConfig.title}
+                message={popupConfig.message}
+                type={popupConfig.type}
+                errors={errors}
+            />
+        
             <h1 className="text-center text-3xl mb-6 mt-10">Editar Liga</h1>
-            {/* Contenedor centrado */}
             <div className="flex justify-center items-center px-4">
                 <div className="w-full max-w-md border border-gray-400 rounded-lg p-7 bg-white shadow-xl">
-                    <form className="space-y-4">
-                        
+                    <form onSubmit={handleSubmit} className="space-y-4">
+
                         {/* Nombre de la liga */}
                         <input
                             type="text"
                             name="nombreLiga"
-                            value={informacion.nombreLiga}
+                            value={nombreLiga}
                             onChange={handleInputChange}
                             placeholder="Nombre de la liga"
                             className="border p-2 w-full rounded-2xl"
@@ -133,6 +212,7 @@ export default function EditarLiga(){
                                 Rango de Edad
                             </label>
                             <div className="flex items-center justify-center space-x-4">
+                                {/* Edad mínima */}
                                 <div className="flex flex-col items-center">
                                     <label className="text-xs text-gray-500 mb-1">Edad Mín.</label>
                                     <div className="flex items-center border border-gray-300 rounded-lg">
@@ -145,7 +225,7 @@ export default function EditarLiga(){
                                         </button>
                                         <input
                                             type="number"
-                                            value={informacion.edadMin}
+                                            value={edadMin}
                                             onChange={(e) => handleAgeInputChange('min', e.target.value)}
                                             className="w-12 h-8 text-center border-0 focus:outline-none"
                                             min="1"
@@ -165,6 +245,7 @@ export default function EditarLiga(){
                                     A:
                                 </div>
 
+                                {/* Edad máxima */}
                                 <div className="flex flex-col items-center">
                                     <label className="text-xs text-gray-500 mb-1">Edad Máx.</label>
                                     <div className="flex items-center border border-gray-300 rounded-lg">
@@ -177,7 +258,7 @@ export default function EditarLiga(){
                                         </button>
                                         <input
                                             type="number"
-                                            value={informacion.edadMax}
+                                            value={edadMax}
                                             onChange={(e) => handleAgeInputChange('max', e.target.value)}
                                             className="w-12 h-8 text-center border-0 focus:outline-none"
                                             min="1"
@@ -194,12 +275,12 @@ export default function EditarLiga(){
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Categoría */}
                         <input
                             type="text"
                             name="categoria"
-                            value={informacion.categoria}
+                            value={categoria}
                             onChange={handleInputChange}
                             placeholder="Categoría"
                             className="border p-2 w-full rounded-2xl"
@@ -209,7 +290,7 @@ export default function EditarLiga(){
                         <input
                             type="text"
                             name="nombrePresidente"
-                            value={informacion.nombrePresidente}
+                            value={nombrePresidente}
                             onChange={handleInputChange}
                             placeholder="Nombre del presidente"
                             className="border p-2 w-full rounded-2xl"
@@ -219,12 +300,12 @@ export default function EditarLiga(){
                         <input
                             type="text"
                             name="contactoPresidente"
-                            value={informacion.contactoPresidente}
+                            value={contactoPresidente}
                             onChange={handleInputChange}
                             placeholder="Contacto del presidente"
                             className="border p-2 w-full rounded-2xl"
                         />
-                        
+
                         {/* Upload de imagen */}
                         <ImageUpload
                             label="Logo de la Liga"
@@ -255,5 +336,5 @@ export default function EditarLiga(){
                 </div>
             </div>
         </>
-    )
+    );
 }
