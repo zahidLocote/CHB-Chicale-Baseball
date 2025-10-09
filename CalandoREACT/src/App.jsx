@@ -3,7 +3,7 @@ import VentanaPrincipal from './pages/VentanaPrincipal'
 import DetalleEquipo from './pages/DetalleEquipo'
 import AltaEquipos from './pages/AltaEquipos'
 import EditarEquipo from './pages/EditarEquipo'
-
+import DetalleJugador from './pages/DetalleJugador'
 function App() {
   return (
     <Routes>
@@ -11,6 +11,7 @@ function App() {
       <Route path="/equipos/:id" element={<DetalleEquipo />} />
       <Route path='/equipos/nuevo' element={<AltaEquipos/>}/>
       <Route path="/equipos/editar/:id" element={<EditarEquipo />}/>
+      <Route path="/jugador/:id" element={<DetalleJugador />} /> 
     </Routes>
   )
 }
