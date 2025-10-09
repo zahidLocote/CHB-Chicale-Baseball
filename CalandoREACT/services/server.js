@@ -184,6 +184,40 @@ app.get('/api/jugadores/equipo/:equipoId', async (req, res) => {
   }
 });
 
+app.put('/api/jugadores/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  const {
+    nombre,
+    apellidoPaterno,
+    apellidoMaterno,
+    fechaNacimiento,
+    numero,
+    posicion,
+    foto
+  } = req.body;
+
+  try {
+    const jugadorActualizado = await prisma.jugador.update({
+      where: { id },
+      data: {
+        nombre,
+        apellidoPaterno,
+        apellidoMaterno,
+        fechaNacimiento: new Date(fechaNacimiento),
+        numero: parseInt(numero),
+        posicion,
+        foto
+      }
+    });
+
+    res.json(jugadorActualizado);
+  } catch (error) {
+    console.error("Error al editar jugador:", error);
+    res.status(500).json({ message: "Error al editar jugador" });
+  }
+});
+
+
 // Eliminar jugador
 app.delete('/api/jugadores/:id', async (req, res) => {
   const id = Number(req.params.id);

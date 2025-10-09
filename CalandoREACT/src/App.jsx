@@ -4,6 +4,8 @@ import DetalleEquipo from './pages/DetalleEquipo'
 import AltaEquipos from './pages/AltaEquipos'
 import EditarEquipo from './pages/EditarEquipo'
 import DetalleJugador from './pages/DetalleJugador'
+import EditarJugador from './pages/EditarJugador';
+
 function App() {
   return (
     <Routes>
@@ -12,6 +14,7 @@ function App() {
       <Route path='/equipos/nuevo' element={<AltaEquipos/>}/>
       <Route path="/equipos/editar/:id" element={<EditarEquipo />}/>
       <Route path="/jugador/:id" element={<DetalleJugador />} /> 
+      <Route path="/jugador/editar/:id" element={<EditarJugador />} />
     </Routes>
   )
 }

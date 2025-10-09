@@ -56,8 +56,8 @@ export default function DetalleEquipo() {
           Agregar Jugador
         </button>
         <button
-          onClick={() => navigate(-1)}
-          className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-400 transition"
+          onClick={() => navigate('/')}
+          className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-400"
         >
           Regresar
         </button>
