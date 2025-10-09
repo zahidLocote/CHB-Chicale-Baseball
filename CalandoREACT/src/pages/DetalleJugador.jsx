@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import placeholderfoto from "../assets/placeholderfoto.jpg";
+import { obtenerJugadorPorId } from "../../services/jugadorService";
 
 export default function DetalleJugador() {
   const { id } = useParams();
@@ -8,39 +9,19 @@ export default function DetalleJugador() {
   const [jugador, setJugador] = useState(null);
 
   useEffect(() => {
-    // Simulación temporal (luego se conectará al backend)
-    const jugadoresSimulados = [
-      {
-        id: 1,
-        nombre: "Juan",
-        apellidoPaterno: "Pérez",
-        apellidoMaterno: "López",
-        fechaNacimiento: "2010-05-12",
-        numero: 9,
-        posicion: "Pitcher",
-        foto: null,
-      },
-      {
-        id: 2,
-        nombre: "Luis",
-        apellidoPaterno: "Gómez",
-        apellidoMaterno: "N/A",
-        fechaNacimiento: "2009-11-23",
-        numero: 22,
-        posicion: "Catcher",
-        foto: null,
-      },
-    ];
-
-    const jugadorEncontrado = jugadoresSimulados.find((j) => j.id === Number(id));
-    setJugador(jugadorEncontrado);
+    obtenerJugadorPorId(id)
+      .then(data => setJugador(data))
+      .catch(error => {
+        console.error("Error al obtener jugador:", error);
+        setJugador(null);
+      });
   }, [id]);
 
   if (!jugador) {
     return <div className="text-center mt-10 text-lg">Cargando información del jugador...</div>;
   }
 
-  const foto = jugador.foto ? jugador.foto : placeholderfoto;
+  const foto = jugador.foto ? `/uploads/${jugador.foto}` : placeholderfoto;
 
   return (
     <div className="p-8 max-w-2xl mx-auto bg-white rounded-lg shadow-lg mt-10">
@@ -68,7 +49,6 @@ export default function DetalleJugador() {
         </p>
       </div>
 
-      {/* Botones de acción */}
       <div className="flex justify-center gap-6 mt-8">
         <button
           className="bg-yellow-500 text-white px-5 py-2 rounded hover:bg-yellow-600"

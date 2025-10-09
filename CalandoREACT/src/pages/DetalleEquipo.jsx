@@ -1,28 +1,25 @@
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { obtenerEquipoPorId } from '../../services/equipoService'
+import { obtenerJugadoresPorEquipo } from '../../services/jugadorService'
 import placeholderfoto from '../assets/placeholderfoto.jpg'
 import AltaJugador from './AltaJugador'
 
 export default function DetalleEquipo() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [equipo, setEquipo] = useState(null)
   const [jugadores, setJugadores] = useState([])
   const [mostrarModal, setMostrarModal] = useState(false)
 
   useEffect(() => {
-    // Carga datos del equipo
     obtenerEquipoPorId(id)
       .then(data => setEquipo(data))
       .catch(error => console.error(error))
 
-    // 🔸 Aquí por ahora usamos datos simulados (luego conectaremos a la API)
-    const jugadoresSimulados = [
-      { id: 1, nombre: 'Juan Pérez', posicion: 'Pitcher', numero: 9, fechaNacimiento: '2010-05-12' },
-      { id: 2, nombre: 'Luis Gómez', posicion: 'Catcher', numero: 15, fechaNacimiento: '2009-11-23' },
-      { id: 3, nombre: 'Carlos Ruiz', posicion: 'Shortstop', numero: 3, fechaNacimiento: '2011-02-17' }
-    ]
-    setJugadores(jugadoresSimulados)
+    obtenerJugadoresPorEquipo(id)
+      .then(data => setJugadores(data))
+      .catch(error => console.error('Error al obtener jugadores:', error))
   }, [id])
 
   if (!equipo) return <p className="text-center mt-8">Cargando equipo...</p>
@@ -78,24 +75,25 @@ export default function DetalleEquipo() {
               <th className="py-3 px-4 text-left">Posición</th>
               <th className="py-3 px-4 text-left">Número</th>
               <th className="py-3 px-4 text-left">Fecha Nacimiento</th>
-
             </tr>
           </thead>
           <tbody>
-  {jugadores.map((jugador, index) => (
-    <tr
-      key={jugador.id}
-      className="border-b hover:bg-green-100 transition cursor-pointer"
-      onClick={() => window.location.href = `/jugador/${jugador.id}`}
-    >
-      <td className="py-2 px-4">{index + 1}</td>
-      <td className="py-2 px-4">{jugador.nombre}</td>
-      <td className="py-2 px-4">{jugador.posicion}</td>
-      <td className="py-2 px-4">{jugador.numero}</td>
-      <td className="py-2 px-4">{jugador.fechaNacimiento}</td>
-    </tr>
-  ))}
-</tbody>
+            {jugadores.map((jugador, index) => (
+              <tr
+                key={jugador.id}
+                className="border-b hover:bg-green-100 transition cursor-pointer"
+                onClick={() => navigate(`/jugador/${jugador.id}`)}
+              >
+                <td className="py-2 px-4">{index + 1}</td>
+                <td className="py-2 px-4">{jugador.nombre}</td>
+                <td className="py-2 px-4">{jugador.posicion}</td>
+                <td className="py-2 px-4">{jugador.numero}</td>
+                <td className="py-2 px-4">
+                  {new Date(jugador.fechaNacimiento).toLocaleDateString("es-MX")}
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
 
