@@ -126,6 +126,51 @@ app.get('/equipos/:id', async (req, res) => {
   res.json(ligas)
 })
 
+//Editar por id Ligas
+app.put('/liga/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente } = req.body
+
+  try {
+    console.log('Datos recibidos:', { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente })
+    const ligaActualizada = await prisma.liga.update({
+      where: { id },
+      data: {
+        nombreLiga,
+        edad_min,
+        edad_max,
+        categoria,
+        nombrePresidente,
+        contactoPresidente
+      }
+
+    })
+    res.json(ligaActualizada)
+  } catch (error) {
+    console.error('Error al editar liga:', error)
+    res.status(500).json({ error: 'No se pudo editar la liga' })
+  }
+})
+
+//Obtener liga por id
+app.get('/liga/:id', async (req, res) => {
+  const id = Number(req.params.id);
+
+  try {
+    const liga = await prisma.liga.findUnique({ where: { id } });
+
+    if (!liga) {
+      return res.status(404).json({ error: 'Liga no encontrada' });
+    }
+
+    res.json(liga);
+  } catch (error) {
+    console.error('Error al obtener liga:', error);
+    res.status(500).json({ error: 'Error al obtener liga' });
+  }
+});
+
+
 // Eliminar equipo
 app.delete('/equipos/:id', async (req, res) => {
   const id = Number(req.params.id)

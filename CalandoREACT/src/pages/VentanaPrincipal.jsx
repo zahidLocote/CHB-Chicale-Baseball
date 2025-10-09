@@ -1,9 +1,13 @@
 import { useEffect,useState } from "react";
 import  InfoCard  from '../components/UI/InfoCard'
 import { obtenerLigas } from '../../services/ligaService'
+import { useNavigate } from 'react-router-dom';  // ← Agregar esto
+
 
 export default function VentanaPrincipal(){
     const [ligas, setLigas] = useState([])
+    const navigate = useNavigate();  // ← Agregar esto
+
 
     useEffect(() => {
         const cargarLigas = async () => {
@@ -18,13 +22,11 @@ export default function VentanaPrincipal(){
     }, [])
 
     const handleVer = (liga) => {
-        console.log('Ver/Editar liga:', liga)
-        // Aquí puedes navegar a una página de edición o abrir un modal
+        navigate(`/editar-liga/${liga.id}`)
     }
 
     const handleEliminar = (liga) => {
         console.log('Eliminar liga:', liga)
-        // Aquí puedes mostrar un modal de confirmación y eliminar
     }
     
     return(

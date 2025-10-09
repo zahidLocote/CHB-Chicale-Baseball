@@ -28,13 +28,29 @@ export async function obtenerLigas() {
   return await res.json()
 }
 
-export async function obtenerLigaPorId(id) {
-  const res = await fetch(`api/liga/${id}`)
+export async function editarLigas(id, datosActualizados) {
+  const res = await fetch(`http://localhost:3001/liga/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datosActualizados)
+  })
 
   if (!res.ok) {
-    throw new Error('Error al obtener liga')
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error al editar equipo')
   }
 
   return await res.json()
 }
+
+export async function obtenerLigaPorId(id) {
+  const res = await fetch(`http://localhost:3001/liga/${id}`); // ← corregido
+
+  if (!res.ok) {
+    throw new Error('Error al obtener liga');
+  }
+
+  return await res.json();
+}
+
 
