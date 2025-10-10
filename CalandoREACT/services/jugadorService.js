@@ -1,5 +1,3 @@
-// src/services/jugadorService.js
-
 const BASE_URL = 'http://localhost:3001/api/jugadores';
 
 export async function crearJugador(jugador) {
@@ -50,6 +48,17 @@ export async function editarJugador(id, datosActualizados) {
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.message || 'Error al editar jugador');
+  }
+
+  return await res.json();
+}
+
+export async function obtenerJugadorPorId(id) {
+  const res = await fetch(`${BASE_URL}/${id}`);
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Error al obtener jugador');
   }
 
   return await res.json();
