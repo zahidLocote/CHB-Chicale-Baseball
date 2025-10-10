@@ -48,6 +48,19 @@ export async function obtenerLigaPorId(id) {
   return await res.json()
 }
 
+export async function eliminarLiga(id) {
+  const res = await fetch(`api/liga/${id}`, {
+    method: 'DELETE'
+  })
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error al eliminar equipo')
+  }
+
+  return await res.json()
+}
+
 
 
 

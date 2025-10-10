@@ -18,6 +18,8 @@ function App() {
       <Route path='/equipos/nuevo' element={<AltaEquipos/>}/>
       <Route path="/equipos/editar/:id" element={<EditarEquipo />}/>
     </Routes>
+
+    <AltaLigas/>
     </>
 
   )

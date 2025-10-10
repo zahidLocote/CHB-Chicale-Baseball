@@ -20,8 +20,6 @@ export default function EditarLiga() {
         type: 'error'
     });
 
-
-
     const [nombreLiga, setNombreLiga] = useState('');
     const [edadMin, setEdadMin] = useState(1);
     const [edadMax, setEdadMax] = useState(1);
@@ -127,7 +125,7 @@ export default function EditarLiga() {
         setShowPopup(false);
         limpiarErrores();
         
-        // Si fue éxito, regresar a la página anterior
+        // Si fue éxito, regresar a la página principal
         if (popupConfig.type === 'success') {
             navigate('/');
         }
@@ -159,7 +157,6 @@ export default function EditarLiga() {
          console.log('Formulario válido, enviando...');
         try {
             // Aquí harías la actualización a la API
-
             await editarLigas(id, {nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente})
             setPopupConfig({
                 title: '¡Éxito!',

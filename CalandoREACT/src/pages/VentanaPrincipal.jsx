@@ -3,6 +3,7 @@ import  InfoCard  from '../components/UI/InfoCard'
 import { obtenerLigas } from '../../services/ligaService'
 import { useNavigate } from 'react-router-dom';
 import EliminarPopUp from "../components/UI/eliminarPopUp";
+import { eliminarLiga } from "../../services/ligaService";
 
 
 export default function VentanaPrincipal(){
@@ -12,17 +13,19 @@ export default function VentanaPrincipal(){
 
 
 
-    useEffect(() => {
-        const cargarLigas = async () => {
-            try {
-                const data = await obtenerLigas()              
-                setLigas(data)
+    const cargarLigas = async () => {
+        try {
+            const data = await obtenerLigas();
+            setLigas(data);
             } catch (error) {
-                console.error('Error al cargar ligas:', error)
+                console.error('Error al cargar ligas:', error);
             }
-        }
-        cargarLigas()
-    }, [])
+    };
+
+    useEffect(() => {
+        cargarLigas();
+    }, []);
+
 
     const handleVer = (liga) => {
         navigate(`/editar-liga/${liga.id}`)
@@ -37,14 +40,16 @@ export default function VentanaPrincipal(){
         setLigaEliminar(null)  // Esto cierra el popup
     }
     const confirmarEliminacion = async () => {
+        console.log(ligaEliminar.id)
         try {
-            console.log('Eliminando liga:', ligaEliminar)
-            // Aquí tu lógica de eliminación
-            setLigaEliminar(null)  // Esto cierra el popup    
+            await eliminarLiga(ligaEliminar.id)
+            console.log('Eliminando liga:', ligaEliminar.nombreLiga)
+            setLigaEliminar(null); // Cierra el popup
+            await cargarLigas(); 
         } catch (error) {
             console.error('Error:', error)
         }
-}
+    }
     
     return(
         <>
@@ -69,13 +74,12 @@ export default function VentanaPrincipal(){
                         />
                     )
                 })}
-                
-                <EliminarPopUp
+            </div>
+             <EliminarPopUp
                     liga={ligaEliminar}
                     onConfirmar={confirmarEliminacion}
                     onCancelar={cancelarEliminacion}
                 />
-            </div>
 
         </>
     )

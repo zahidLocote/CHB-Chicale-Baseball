@@ -210,4 +210,16 @@ app.put('/liga/:id', async (req, res) => {
   }
 })
 
+//Eliminar liga
+app.delete('/liga/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  try {
+    await prisma.liga.delete({ where: { id } })
+    res.json({ mensaje: 'Liga eliminada correctamente' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al eliminar liga' })
+  }
+})
+
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))
