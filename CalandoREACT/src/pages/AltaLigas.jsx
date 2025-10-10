@@ -3,9 +3,12 @@ import { AlertaPopUp } from '../components/UI/AlertaPopUp';
 import { ImageUpload } from '../components/UI/ImageUpload';
 import { registrarLiga } from '../../services/ligaService';
 import { ligaFormValidation } from '../hooks/ligaFormValidation';  // ← Importar hook
+import { useNavigate } from 'react-router-dom';
 
 export default function AltaJugador() {
   const { errors, validarFormularioLiga, limpiarError, limpiarErrores } = ligaFormValidation();  // ← Usar hook
+  const navigate = useNavigate();  // ← Agregar esta línea
+
   
   const [formData, setFormData] = useState({
     nombreLiga: '',
@@ -164,20 +167,6 @@ export default function AltaJugador() {
       });
       setShowPopup(true);
     }
-  };
-
-  const handleCancel = () => {
-    setFormData({
-      nombreLiga: '',
-      edadMin: 0,
-      edadMax: 0,
-      categoria: '',
-      nombrePresidente: '',
-      contactoPresidente: '',
-      logoLiga: null
-    });
-    limpiarErrores();  // ← Usar función del hook
-    setImagePreview(null);
   };
 
   const handleClosePopup = () => {
@@ -352,7 +341,7 @@ export default function AltaJugador() {
               <button
                 name='cancelarBtn'
                 type="button"
-                onClick={handleCancel}
+                onClick={() => navigate('/')}
                 className="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-800"
               >
                 Cancelar

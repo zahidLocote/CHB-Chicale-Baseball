@@ -11,8 +11,6 @@ export default function VentanaPrincipal(){
     const navigate = useNavigate();
     const [ligaEliminar, setLigaEliminar] = useState(null)
 
-
-
     const cargarLigas = async () => {
         try {
             const data = await obtenerLigas();
@@ -30,6 +28,10 @@ export default function VentanaPrincipal(){
     const handleVer = (liga) => {
         navigate(`/editar-liga/${liga.id}`)
     }
+
+    const handleVerEquipos = (liga) => {
+        navigate(`/ligas/${liga.id}/equipos`, { state: { liga } });
+    }   
 
     const handleEliminar = (liga) => {
         console.log('Eliminar liga:', liga)
@@ -53,7 +55,7 @@ export default function VentanaPrincipal(){
     
     return(
         <>
-            <h1 className="text-center text-3xl mb-6">Consulta de Ligas</h1>
+            <h1 className="text-center font-bold text-3xl mb-6">Consulta de Ligas</h1>
 
             <div className="grid grid-cols-4 gap-6 p-4">
                 {ligas.map(liga => {
@@ -65,13 +67,16 @@ export default function VentanaPrincipal(){
                     }
 
                     return (
-                        <InfoCard 
-                            key={liga.id} 
+                        <div key={liga.id} onClick={() => handleVerEquipos(liga)} className="cursor-pointer" >
+              
+                            <InfoCard
                             data={dataAdapt}
                             tipo="liga"
                             onVer={() => handleVer(liga)}
                             onEliminar={() => handleEliminar(liga)}
-                        />
+                             />
+                        </div>
+
                     )
                 })}
             </div>
@@ -80,7 +85,11 @@ export default function VentanaPrincipal(){
                     onConfirmar={confirmarEliminacion}
                     onCancelar={cancelarEliminacion}
                 />
-
+            <div className="flex justify-center mt-6">
+                <button onClick={() => navigate('ligas/nuevo')} className="bg-green-200 text-green-800 font-semibold px-4 py-2 rounded hover:bg-green-300 cursor-pointer">
+                    Agregar Liga
+                </button>
+            </div>
         </>
     )
 }

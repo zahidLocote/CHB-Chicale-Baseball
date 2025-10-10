@@ -12,7 +12,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // Agregar equipo
-app.post('/equipos', async (req, res) => {
+app.post('/equipo', async (req, res) => {
   const { nombre, entrenador, logo, ligaId } = req.body
 
   try {
@@ -95,14 +95,25 @@ app.post('/liga', async (req, res) => {
   }
 })
 
-// Obtener equipos
-app.get('/equipos', async (req, res) => {
-  const equipos = await prisma.equipo.findMany()
-  res.json(equipos)
-})
+// Obtener equipos por id de liga
+app.get('/equipo', async (req, res) => {
+  const { ligaId } = req.query;
+
+  try {
+    const equipos = await prisma.equipo.findMany({
+      where: ligaId ? { ligaId: Number(ligaId) } : undefined
+    });
+
+    res.json(equipos);
+  } catch (error) {
+    console.error('Error al obtener equipos:', error);
+    res.status(500).json({ error: 'Error al obtener equipos' });
+  } 
+});
+
 
 // Obtener equipo por id
-app.get('/equipos/:id', async (req, res) => {
+app.get('/equipo/:id', async (req, res) => {
   const id = Number(req.params.id)
 
   try {
@@ -148,7 +159,7 @@ app.get('/liga/:id', async (req, res) => {
 1
 
 // Eliminar equipo
-app.delete('/equipos/:id', async (req, res) => {
+app.delete('/equipo/:id', async (req, res) => {
   const id = Number(req.params.id)
   try {
     await prisma.equipo.delete({ where: { id } })
@@ -161,7 +172,7 @@ app.delete('/equipos/:id', async (req, res) => {
 
 
 // Editar Equipo
-app.put('/equipos/:id', async (req, res) => {
+app.put('/equipo/:id', async (req, res) => {
   const id = Number(req.params.id)
   const { nombre, entrenador, logo, ligaId } = req.body
 
@@ -203,7 +214,7 @@ app.put('/liga/:id', async (req, res) => {
       }
 
     })
-    res.json(ligaActualizadas)
+    res.json(ligaActualizada)
   } catch (error) {
     console.error('Error al editar equipo:', error)
     res.status(500).json({ error: 'No se pudo editar el equipo' })

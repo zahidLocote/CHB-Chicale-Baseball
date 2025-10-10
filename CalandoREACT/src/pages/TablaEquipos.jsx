@@ -1,15 +1,35 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import InfoCard from '../components/UI/InfoCard'
-import { obtenerEquipos, eliminarEquipo } from '../../services/equipoService'
+import { eliminarEquipo, obtenerEquiposPorLiga } from '../../services/equipoService'
+import { useParams } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import { obtenerLigaPorId } from '../../services/ligaService' // Importa esta función
+
 
 export default function TablaEquipos() {
   const [equipos, setEquipos] = useState([])
+  const [liga, setLiga] = useState(null) // Cambia esto a 
   const navigate = useNavigate()
+  const { id } = useParams() // Obtiene el ID de la liga desde la URL
+  const { state } = useLocation() // Obtiene datos adicionales pasados desde VentanaPrincipal
 
   useEffect(() => {
-    obtenerEquipos().then(setEquipos).catch(console.error)
-  }, [])
+    // Si viene la liga desde el state, úsala
+    if (state?.liga) {
+      setLiga(state.liga)
+    } else {
+      // Si no, obténla desde el servicio
+      obtenerLigaPorId(id)
+        .then(setLiga)
+        .catch(console.error)
+    }
+
+    // Obtiene los equipos
+    obtenerEquiposPorLiga(id)
+      .then(setEquipos)
+      .catch(console.error)
+  }, [id, state])
 
   const handleEliminar = async (id) => {
     const primera = window.confirm("¿Deseas eliminar este registro?")
@@ -28,9 +48,12 @@ export default function TablaEquipos() {
     }
   }
 
-
   return (
     <>
+    <button onClick={() => navigate(-1)} className="text-xl text-blue-500 underline hover:text-blue-800  ml-50">
+        ← Volver
+    </button>
+    <h1 className='text-center text-3xl font-bold '>Equipos en la liga {liga?.nombreLiga}</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {equipos.map((equipo) => (
           <div key={equipo.id} onClick={() => navigate(`/equipos/${equipo.id}`)} className="cursor-pointer">
