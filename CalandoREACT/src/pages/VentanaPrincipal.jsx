@@ -1,12 +1,15 @@
 import { useEffect,useState } from "react";
 import  InfoCard  from '../components/UI/InfoCard'
 import { obtenerLigas } from '../../services/ligaService'
-import { useNavigate } from 'react-router-dom';  // ← Agregar esto
+import { useNavigate } from 'react-router-dom';
+import EliminarPopUp from "../components/UI/eliminarPopUp";
 
 
 export default function VentanaPrincipal(){
     const [ligas, setLigas] = useState([])
-    const navigate = useNavigate();  // ← Agregar esto
+    const navigate = useNavigate();
+    const [ligaEliminar, setLigaEliminar] = useState(null)
+
 
 
     useEffect(() => {
@@ -27,7 +30,21 @@ export default function VentanaPrincipal(){
 
     const handleEliminar = (liga) => {
         console.log('Eliminar liga:', liga)
+        setLigaEliminar(liga)
     }
+
+    const cancelarEliminacion = () => {
+        setLigaEliminar(null)  // Esto cierra el popup
+    }
+    const confirmarEliminacion = async () => {
+        try {
+            console.log('Eliminando liga:', ligaEliminar)
+            // Aquí tu lógica de eliminación
+            setLigaEliminar(null)  // Esto cierra el popup    
+        } catch (error) {
+            console.error('Error:', error)
+        }
+}
     
     return(
         <>
@@ -52,6 +69,12 @@ export default function VentanaPrincipal(){
                         />
                     )
                 })}
+                
+                <EliminarPopUp
+                    liga={ligaEliminar}
+                    onConfirmar={confirmarEliminacion}
+                    onCancelar={cancelarEliminacion}
+                />
             </div>
 
         </>

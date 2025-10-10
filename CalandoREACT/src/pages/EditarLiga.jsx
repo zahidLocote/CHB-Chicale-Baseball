@@ -129,7 +129,7 @@ export default function EditarLiga() {
         
         // Si fue éxito, regresar a la página anterior
         if (popupConfig.type === 'success') {
-            navigate(-1);
+            navigate('/');
         }
     };
 
