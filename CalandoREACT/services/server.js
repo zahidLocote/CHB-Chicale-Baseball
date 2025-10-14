@@ -92,8 +92,6 @@ app.delete('/equipos/:id', async (req, res) => {
 });
 
 // 🔹 LIGAS
-
-// Obtener ligas
 // Ruta POST para crear liga
 app.post('/liga', async (req, res) => {
   try {

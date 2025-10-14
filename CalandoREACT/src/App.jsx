@@ -19,10 +19,11 @@ function App() {
         <Route path="/editar-liga/:id" element={<EditarLiga />} />
         <Route path="/ligas/:id/equipos" element={<TablaEquipos />} />
         <Route path="/equipos/:id" element={<DetalleEquipo />} />
-        <Route path='/equipos/nuevo' element={<AltaEquipos />} />
+        <Route path="/nuevo" element={<AltaEquipos />} />
         <Route path="/equipos/editar/:id" element={<EditarEquipo />} />
         <Route path="/jugador/:id" element={<DetalleJugador />} />
         <Route path="/jugador/editar/:id" element={<EditarJugador />} />
+        <Route path='*' element={<h1>ERROR</h1>}/>
       </Routes>
     </>
 

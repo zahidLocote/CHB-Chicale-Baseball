@@ -1,6 +1,6 @@
 export async function registrarLiga(data) {
   try {
-    const response = await fetch('api/liga', {
+    const response = await fetch('/api/liga', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
