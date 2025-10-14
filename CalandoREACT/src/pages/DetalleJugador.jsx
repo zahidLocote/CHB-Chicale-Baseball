@@ -60,8 +60,7 @@ export default function DetalleJugador() {
         <button
           className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
           onClick={() => {
-            const confirmar = confirm("¿Deseas eliminar este jugador?");
-            if (confirmar) alert("Jugador eliminado (simulado)");
+            
           }}
         >
           Eliminar
