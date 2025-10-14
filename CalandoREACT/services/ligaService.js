@@ -24,17 +24,45 @@ export async function obtenerLigas() {
   if (!res.ok) {
     throw new Error('Error al obtener ligas')
   }
+  return await res.json()
+}
 
+export async function editarLigas(id, datosActualizados) {
+  const res = await fetch(`/api/liga/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datosActualizados)
+  })
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error al editar equipo')
+  }
   return await res.json()
 }
 
 export async function obtenerLigaPorId(id) {
-  const res = await fetch(`api/liga/${id}`)
+  const res = await fetch(`/api/liga/${id}`);
+
+  if (!res.ok) throw new Error('Error al obtener liga')
+  return await res.json()
+}
+
+export async function eliminarLiga(id) {
+  const res = await fetch(`api/liga/${id}`, {
+    method: 'DELETE'
+  })
 
   if (!res.ok) {
-    throw new Error('Error al obtener liga')
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error al eliminar equipo')
   }
 
   return await res.json()
 }
+
+
+
+
+
 

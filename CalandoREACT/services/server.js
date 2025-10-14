@@ -6,16 +6,15 @@ import { PrismaClient } from './generated/prisma/index.js';
 dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
-
 app.use(cors());
 app.use(express.json());
 
 // 🔹 EQUIPOS
 
 // Agregar equipo
-app.post('/equipos', async (req, res) => {
-  const { nombre, entrenador, logo, ligaId } = req.body;
 
+app.post('/equipo', async (req, res) => {
+  const { nombre, entrenador, logo, ligaId } = req.body
   try {
     const nuevoEquipo = await prisma.equipo.create({
       data: {
@@ -103,8 +102,8 @@ app.post('/liga', async (req, res) => {
     console.log('Datos recibidos:', req.body)
 
     if (!nombreLiga || !categoria || !nombrePresidente || !contactoPresidente) {
-      return res.status(400).json({ 
-        error: 'Todos los campos son obligatorios excepto el logo' 
+      return res.status(400).json({
+        error: 'Todos los campos son obligatorios excepto el logo'
       })
     }
 
@@ -112,14 +111,14 @@ app.post('/liga', async (req, res) => {
     const edadMaxNum = parseInt(edadMax)
 
     if (isNaN(edadMinNum) || isNaN(edadMaxNum)) {
-      return res.status(400).json({ 
-        error: 'Las edades deben ser números válidos' 
+      return res.status(400).json({
+        error: 'Las edades deben ser números válidos'
       })
     }
 
     if (edadMinNum > edadMaxNum) {
-      return res.status(400).json({ 
-        error: 'La edad mínima no puede ser mayor que la edad máxima' 
+      return res.status(400).json({
+        error: 'La edad mínima no puede ser mayor que la edad máxima'
       })
     }
 
@@ -143,16 +142,53 @@ app.post('/liga', async (req, res) => {
 
   } catch (error) {
     console.error('Error al crear liga:', error)
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Error al registrar la liga',
-      details: error.message 
+      details: error.message
     })
   }
 })
 
+// Obtener equipos por id de liga
+app.get('/equipo', async (req, res) => {
+  const { ligaId } = req.query;
+
+  try {
+    const equipos = await prisma.equipo.findMany({
+      where: ligaId ? { ligaId: Number(ligaId) } : undefined
+    });
+
+    res.json(equipos);
+  } catch (error) {
+    console.error('Error al obtener equipos:', error);
+    res.status(500).json({ error: 'Error al obtener equipos' });
+  }
+});
+
+
+// Obtener equipo por id
+app.get('/equipo/:id', async (req, res) => {
+  const id = Number(req.params.id)
+
+  try {
+    const equipo = await prisma.equipo.findUnique({
+      where: { id }
+    })
+
+    if (!equipo) {
+      return res.status(404).json({ error: 'Equipo no encontrado' })
+    }
+
+    res.json(equipo)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al obtener equipo' })
+  }
+})
+
 // Obtener ligas
-  app.get('/liga', async (req, res) => {
-    const ligas = await prisma.liga.findMany()
+app.get('/liga', async (req, res) => {
+  const ligas = await prisma.liga.findMany()
   res.json(ligas)
 })
 
@@ -160,7 +196,6 @@ app.post('/liga', async (req, res) => {
 //Obtener liga por id
 app.get('/liga/:id', async (req, res) => {
   const id = Number(req.params.id);
-
   try {
     const liga = await prisma.liga.findUnique({ where: { id } });
 
@@ -174,13 +209,33 @@ app.get('/liga/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener liga' });
   }
 });
-//Editar ligas
-app.put('/liga/:id', async (req, res) => {
+
+
+// Eliminar equipo
+app.delete('/equipo/:id', async (req, res) => {
   const id = Number(req.params.id)
-  const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente  } = req.body
+  try {
+    const liga = await prisma.liga.findUnique({ where: { id } });
+
+    if (!liga) {
+      return res.status(404).json({ error: 'Liga no encontrada' });
+    }
+
+    res.json(liga);
+  } catch (error) {
+    console.error('Error al obtener liga:', error);
+    res.status(500).json({ error: 'Error al obtener liga' });
+  }
+
+});
+
+// Editar Equipo
+app.put('/equipo/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente } = req.body
 
   try {
-    console.log('Datos recibidos:', { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente  })
+    console.log('Datos recibidos:', { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente })
     const ligaActualizada = await prisma.liga.update({
       where: { id },
       data: {
@@ -321,6 +376,45 @@ app.delete('/api/jugadores/:id', async (req, res) => {
     res.status(500).json({ message: "Error al eliminar jugador" });
   }
 });
+
+
+//Editar ligas
+app.put('/liga/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente } = req.body
+
+  try {
+    console.log('Datos recibidos:', { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente })
+    const ligaActualizada = await prisma.liga.update({
+      where: { id },
+      data: {
+        nombreLiga,
+        edad_min: edadMin,
+        edad_max: edadMax,
+        categoria,
+        nombrePresidente,
+        contactoPresidente,
+      }
+
+    })
+    res.json(ligaActualizada)
+  } catch (error) {
+    console.error('Error al editar equipo:', error)
+    res.status(500).json({ error: 'No se pudo editar el equipo' })
+  }
+})
+
+//Eliminar liga
+app.delete('/liga/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  try {
+    await prisma.liga.delete({ where: { id } })
+    res.json({ mensaje: 'Liga eliminada correctamente' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al eliminar liga' })
+  }
+})
 
 // 🔹 INICIO DEL SERVIDOR
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'));

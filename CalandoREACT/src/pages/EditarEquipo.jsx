@@ -18,7 +18,7 @@ export default function EditarEquipo() {
 
     useEffect(() => {
         fetch('http://localhost:3001/ligas')
-            .then(res => res.json())
+            .then(res => res.json())    
             .then(data => setLigas(data))
 
         obtenerEquipoPorId(id)
