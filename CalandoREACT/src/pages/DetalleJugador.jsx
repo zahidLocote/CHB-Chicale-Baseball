@@ -1,7 +1,8 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { obtenerJugadorPorId } from '../../services/jugadorService';
-import placeholderfoto from '../assets/placeholderfoto.jpg';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import placeholderfoto from "../assets/placeholderfoto.jpg";
+import { obtenerJugadorPorId } from "../../services/jugadorService";
+import { eliminarJugador } from "../../services/jugadorService";
 
 export default function DetalleJugador() {
   const { id } = useParams();
@@ -44,15 +45,43 @@ export default function DetalleJugador() {
           Editar
         </button>
 
-        {jugador.equipoId && (
-          <button
-            onClick={() => navigate(`/equipos/${jugador.equipoId}`)}
-            className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-400"
-          >
-            Regresar
-          </button>
-        )}
-      </div>
-    </div>
+        {
+          jugador.equipoId && (
+            <button
+              onClick={() => navigate(`/equipos/${jugador.equipoId}`)}
+              className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-400"
+            >
+              Regresar
+            </button>
+          )
+        }
+
+        <button
+          className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
+          onClick={async () => {
+            const confirmar = window.confirm("¿Seguro que deseas eliminar este jugador?");
+            if (!confirmar) return;
+
+            try {
+              await eliminarJugador(id);
+              alert("Jugador eliminado correctamente");
+              navigate(-1); // Regresa a la pantalla anterior (detalle del equipo)
+            } catch (error) {
+              alert(error.message || "Error al eliminar jugador");
+              console.error(error);
+            }
+          }}
+        >
+          Eliminar
+        </button>
+
+        <button
+          onClick={() => navigate(-1)}
+          className="bg-gray-400 text-white px-5 py-2 rounded hover:bg-gray-500"
+        >
+          Volver
+        </button>
+      </div >
+    </div >
   );
 }
