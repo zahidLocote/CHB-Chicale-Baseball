@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate} from 'react-router-dom';
 import { useState, useEffect } from 'react'
 import InfoCard from '../components/UI/InfoCard'
 import { eliminarEquipo, obtenerEquiposPorLiga } from '../../services/equipoService'
@@ -50,10 +50,10 @@ export default function TablaEquipos() {
 
   return (
     <>
-    <button onClick={() => navigate(-1)} className="text-xl text-blue-500 underline hover:text-blue-800  ml-50">
+      <button onClick={() => navigate(-1)} className="text-xl text-blue-500 underline hover:text-blue-800  ml-50">
         ← Volver
-    </button>
-    <h1 className='text-center text-3xl font-bold '>Equipos en la liga {liga?.nombreLiga}</h1>
+      </button>
+      <h1 className='text-center text-3xl font-bold '>Equipos en la liga {liga?.nombreLiga}</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {equipos.map((equipo) => (
           <div key={equipo.id} onClick={() => navigate(`/equipos/${equipo.id}`)} className="cursor-pointer">
@@ -68,9 +68,13 @@ export default function TablaEquipos() {
         ))}
       </div>
       <div className="flex justify-center mt-6">
-        <button onClick={() => navigate('/nuevo')} className="bg-green-200 text-green-800 font-semibold px-4 py-2 rounded hover:bg-green-300 cursor-pointer">
+        <button
+          onClick={() => navigate('/nuevo', { state: { ligaId: id } })}
+          className="bg-green-200 text-green-800 font-semibold px-4 py-2 rounded hover:bg-green-300 cursor-pointer"
+        >
           Agregar Equipo
         </button>
+
       </div>
     </>
   )

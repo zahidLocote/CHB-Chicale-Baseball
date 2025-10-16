@@ -36,7 +36,7 @@ app.post('/equipos', async (req, res) => {
 });
 
 // Obtener todos los equipos
-app.get('/equipos', async (req, res) => {
+/*app.get('/equipos', async (req, res) => {
   try {
     const equipos = await prisma.equipo.findMany({
       include: { liga: true, jugadores: true }
@@ -46,7 +46,7 @@ app.get('/equipos', async (req, res) => {
     console.error('Error al obtener equipos:', error);
     res.status(500).json({ error: 'Error al obtener equipos' });
   }
-});
+});*/
 
 // Obtener equipo por ID
 app.get('/equipos/:id', async (req, res) => {
@@ -168,7 +168,7 @@ app.post('/liga', async (req, res) => {
 })
 
 // Obtener equipos por id de liga
-app.get('/equipo', async (req, res) => {
+app.get('/equipos', async (req, res) => {
   const { ligaId } = req.query;
 
   try {
@@ -180,7 +180,7 @@ app.get('/equipo', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener equipos:', error);
     res.status(500).json({ error: 'Error al obtener equipos' });
-  }
+  } 
 });
 
 

@@ -3,21 +3,26 @@ import { useNavigate } from 'react-router-dom'
 import { crearEquipo } from '../../services/equipoService'
 import PictureBox from '../components/UI/PictureBox'
 import useFormValidation from '../hooks/useFormValidation'
+import { useLocation } from 'react-router-dom'
+
 
 export default function AltaEquipos() {
-    const navigate = useNavigate()
-    const { validarEquipos } = useFormValidation()
-    const [nombre, setNombre] = useState('')
-    const [entrenador, setEntrenador] = useState('')
-    const [ligaId, setLigaId] = useState('1')
-    const [ligas, setLigas] = useState([])
-    const [logo, setLogo] = useState(null)
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const { validarEquipos } = useFormValidation();
+    const [nombre, setNombre] = useState('');
+    const [entrenador, setEntrenador] = useState('');
+    const [ligaId, setLigaId] = useState(null);
+    const [logo, setLogo] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:3001/equipo')
-            .then(res => res.json())
-            .then(data => setLigas(data))
-    }, [])
+        // Toma el id de la liga madre si fue enviada
+        if (location.state?.ligaId) {
+            setLigaId(location.state.ligaId);
+        }
+    }, [location.state]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault()

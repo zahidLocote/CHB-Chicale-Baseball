@@ -6,23 +6,13 @@ export async function crearEquipo({ nombre, entrenador, logo, ligaId }) {
     ligaId: Number(ligaId)
   }
 
-  const res = await fetch('/api/equipo', {
+  const res = await fetch('/api/equipos', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(equipo)
   })
 
   if (!res.ok) throw new Error('Error al crear equipo')
-  return await res.json()
-}
-
-export async function obtenerEquipos() {
-  const res = await fetch('http://localhost:3001/equipos')
-
-  if (!res.ok) {
-    throw new Error('Error al obtener equipos')
-  }
-
   return await res.json()
 }
 
@@ -46,7 +36,7 @@ export async function eliminarEquipo(id) {
 }
 
 export async function editarEquipo(id, datosActualizados) {
-  const res = await fetch(`http://localhost:3001/equipo/${id}`, {
+  const res = await fetch(`http://localhost:3001/equipos/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(datosActualizados)
@@ -61,8 +51,8 @@ export async function editarEquipo(id, datosActualizados) {
 }
 
 export async function obtenerEquiposPorLiga(ligaId) {
-  const res = await fetch(`/api/equipo?ligaId=${ligaId}`);
-  
+  const res = await fetch(`http://localhost:3001/equipos?ligaId=${ligaId}`);
+
   if (!res.ok) {
     throw new Error('Error al obtener equipos por liga');
   }
