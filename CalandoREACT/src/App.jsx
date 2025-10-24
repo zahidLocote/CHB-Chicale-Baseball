@@ -7,6 +7,7 @@ import EditarEquipo from './pages/EditarEquipo'
 import  AltaLigas  from './pages/AltaLigas'
 import EditarLiga from './pages/EditarLiga'
 import TablaEquipos from './pages/TablaEquipos'
+import AltaPartido from './pages/AltaPartido'
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       <Route path="/equipos/:id" element={<DetalleEquipo />} />
       <Route path='/equipos/nuevo' element={<AltaEquipos/>}/>
       <Route path="/equipos/editar/:id" element={<EditarEquipo />}/>
+      <Route path="/partidoNuevo" element={<AltaPartido/>}/>
     </Routes>
     </>
 
