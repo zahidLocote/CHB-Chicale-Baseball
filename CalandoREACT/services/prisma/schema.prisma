@@ -35,3 +35,23 @@ model equipo{
   ligaId Int?
   liga Liga?   @relation(fields: [ligaId], references: [id])
 }
+
+model Partido {
+  id               Int      @id @default(autoincrement())
+  fecha            DateTime
+  lugar            String
+  hora             String
+  estado           EstadoPartido @default(PROGRAMADO)
+
+  equipoId1        Int
+  equipoId2        Int
+  equipoNombre1    String
+  equipoNombre2    String
+  score1           Int      @default(0)
+  score2           Int      @default(0)
+}
+enum EstadoPartido {
+  PROGRAMADO
+ENVIVO
+  FINALIZADO
+}

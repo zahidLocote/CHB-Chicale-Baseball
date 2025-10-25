@@ -31,5 +31,20 @@ CREATE TABLE `equipo` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `Partido` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `fecha` DATETIME(3) NOT NULL,
+    `lugar` VARCHAR(191) NOT NULL,
+    `hora` VARCHAR(191) NOT NULL,
+    `estado` ENUM('PROGRAMADO', 'ENVIVO', 'FINALIZADO') NOT NULL DEFAULT 'PROGRAMADO',
+    `equipo1Id` INTEGER NOT NULL,
+    `equipo2Id` INTEGER NOT NULL,
+    `score1` INTEGER NOT NULL DEFAULT 0,
+    `score2` INTEGER NOT NULL DEFAULT 0,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `equipo` ADD CONSTRAINT `equipo_ligaId_fkey` FOREIGN KEY (`ligaId`) REFERENCES `Liga`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

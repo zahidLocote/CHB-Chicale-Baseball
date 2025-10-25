@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { AlertaPopUp } from '../components/UI/AlertaPopUp';
 import { ImageUpload } from '../components/UI/ImageUpload';
 import { registrarLiga } from '../../services/ligaService';
-import { ligaFormValidation } from '../hooks/ligaFormValidation';  // ← Importar hook
+import { ligaFormValidation } from '../hooks/ligaFormValidation'; 
 import { useNavigate } from 'react-router-dom';
 
 export default function AltaJugador() {
-  const { errors, validarFormularioLiga, limpiarError, limpiarErrores } = ligaFormValidation();  // ← Usar hook
-  const navigate = useNavigate();  // ← Agregar esta línea
+  const { errors, validarFormularioLiga, limpiarError, limpiarErrores } = ligaFormValidation();
+  const navigate = useNavigate();
 
   
   const [formData, setFormData] = useState({
@@ -137,6 +137,7 @@ export default function AltaJugador() {
           type: 'success'
         });
         setShowPopup(true);
+        
         
         // Resetear formulario
         setFormData({
