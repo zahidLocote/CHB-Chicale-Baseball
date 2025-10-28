@@ -75,7 +75,8 @@ const handleSubmit = async (e) => {
         equipoNombre2,
         fecha: new Date(fechaPartido),           
         lugar: direccionPartido,       
-        hora: horaPartido 
+        hora: horaPartido,
+        ligaId: liga?.id,
     };
     //console.log('Datos del partido:', datos);
     //console.log(equipoNombre1,"+",equipoNombre2);

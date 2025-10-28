@@ -25,7 +25,8 @@ model Liga{
   categoria String
   nombrePresidente String
   contactoPresidente String
-  equipo equipo[]
+  equipo               equipo[]
+  partido              Partido[]
 }
 model equipo{
   id  Int @id @default(autoincrement())
@@ -49,6 +50,9 @@ model Partido {
   equipoNombre2    String
   score1           Int      @default(0)
   score2           Int      @default(0)
+
+  ligaId         Int
+  liga           Liga           @relation(fields: [ligaId], references: [id])
 }
 enum EstadoPartido {
   PROGRAMADO

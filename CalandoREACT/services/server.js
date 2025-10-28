@@ -234,7 +234,7 @@ app.delete('/liga/:id', async (req, res) => {
 //Registro de partidos
 app.post('/partido', async (req, res) =>{
     try{
-        const {fecha, lugar,hora, equipoId1,equipoId2,equipoNombre1,equipoNombre2} = req.body
+        const {fecha, lugar,hora, equipoId1,equipoId2,equipoNombre1,equipoNombre2, ligaId,} = req.body
 
         const nuevoPartido = await prisma.partido.create({
             data: {
@@ -244,7 +244,8 @@ app.post('/partido', async (req, res) =>{
                 equipoId1,
                 equipoId2,
                 equipoNombre1,
-                equipoNombre2
+                equipoNombre2,
+                ligaId,
             }
         })
 
