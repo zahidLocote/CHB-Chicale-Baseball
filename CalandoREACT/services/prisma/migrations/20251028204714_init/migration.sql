@@ -38,8 +38,10 @@ CREATE TABLE `Partido` (
     `lugar` VARCHAR(191) NOT NULL,
     `hora` VARCHAR(191) NOT NULL,
     `estado` ENUM('PROGRAMADO', 'ENVIVO', 'FINALIZADO') NOT NULL DEFAULT 'PROGRAMADO',
-    `equipo1Id` INTEGER NOT NULL,
-    `equipo2Id` INTEGER NOT NULL,
+    `equipoId1` INTEGER NOT NULL,
+    `equipoId2` INTEGER NOT NULL,
+    `equipoNombre1` VARCHAR(191) NOT NULL,
+    `equipoNombre2` VARCHAR(191) NOT NULL,
     `score1` INTEGER NOT NULL DEFAULT 0,
     `score2` INTEGER NOT NULL DEFAULT 0,
 
