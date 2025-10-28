@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { obtenerEquiposPorLiga } from '../../services/equipoService';
+import { registrarPartido } from '../../services/partidoService';
+import { AlertaPopUp } from '../components/UI/AlertaPopUp';
 
 export default function AltaPartido (){
     const { state } = useLocation();
     const navigate = useNavigate()
     const liga = state?.liga;
 
+    const [showAlerta, setShowAlerta] = useState(false);
+    const [erroresFormulario, setErroresFormulario] = useState({});
+    const [tipoAlerta, setTipoAlerta] = useState('error'); // 'error' | 'success'
+    const [mensajeAlerta, setMensajeAlerta] = useState('');
+    
     const [equipos, setEquipos] = useState([]);
 
     const [equipoId1, setEquipoId1] = useState('');
@@ -16,8 +23,6 @@ export default function AltaPartido (){
     const [fechaPartido, setFechaPartido] = useState('');
     const [direccionPartido, setDireccionPartido] = useState('');
     const [horaPartido, setHoraPartido] = useState('');
-
-
 
     useEffect(() => {
   if (liga?.id) {
@@ -29,18 +34,74 @@ export default function AltaPartido (){
   }
 }, [liga]);
     
-const handleSubmit = () => {
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const errores = {};
+    const hoy = new Date();
+    const fechaIngresada = new Date(fechaPartido);
+    const horaActual = hoy.toTimeString().slice(0, 5); // formato HH:mm
+
+
+
+    if (!equipoId1) errores.equipoId1 = 'Selecciona el primer equipo';
+    if (!equipoId2) errores.equipoId2 = 'Selecciona el segundo equipo';
+    if (equipoId1 && equipoId2 && equipoId1 === equipoId2)
+        errores.equiposIguales = 'Los equipos rivales no pueden ser iguales';
+    if (!fechaPartido) {
+        errores.fechaPartido = 'Selecciona la fecha del partido';
+    } else if (fechaIngresada.setHours(0, 0, 0, 0) < hoy.setHours(0, 0, 0, 0)) {
+        errores.fechaInvalida = 'La fecha no puede ser anterior a hoy';
+    }
+
+    if (!direccionPartido) errores.direccionPartido = 'Ingresa la dirección del partido';
+    if (!horaPartido) {
+        errores.horaPartido = 'Selecciona la hora del partido';
+    } else if ( fechaIngresada.setHours(0, 0, 0, 0) === hoy.setHours(0, 0, 0, 0) && horaPartido < horaActual) {
+    errores.horaInvalida = 'La hora no puede ser anterior a la actual';
+    }
+
+
+    if (Object.keys(errores).length > 0) {
+        setErroresFormulario(errores);
+        setShowAlerta(true);
+        return;
+    }    
+    
     const datos = {
         equipoId1,
         equipoId2,
         equipoNombre1,
         equipoNombre2,
-        fechaPartido,
-        direccionPartido,
-        horaPartido
+        fecha: new Date(fechaPartido),           
+        lugar: direccionPartido,       
+        hora: horaPartido 
     };
-    console.log('Datos del partido:', datos);
-  };
+    //console.log('Datos del partido:', datos);
+    //console.log(equipoNombre1,"+",equipoNombre2);
+
+    try {
+    
+        const response = await registrarPartido(datos);
+        console.log('Partido registrado exitosamente:', response);
+
+        setTipoAlerta('success');
+        setMensajeAlerta('Partido registrado correctamente');
+        setErroresFormulario({});
+        setShowAlerta(true);
+
+  // Opcional: navegar después de unos segundos
+        setTimeout(() => {
+            navigate(-1);
+        }, 2000);
+    } catch (error) {
+        console.error('Error al registrar partido:', error);
+        setTipoAlerta('error');
+        setErroresFormulario({ server: '❌ Hubo un error al registrar el partido' });
+        setShowAlerta(true);
+
+    }
+};
 
     return(
         <>
@@ -51,7 +112,7 @@ const handleSubmit = () => {
 
             <div className="flex justify-center mt-6 gap-x-40 mb-20">
                 <select name="equipo1" value={equipoId1} onChange={(e) => {
-                    const id = e.target.value;
+                    const id = Number(e.target.value)
                     setEquipoId1(id);
                     const equipo = equipos.find(eq => eq.id === id);
                     setEquipoNombre1(equipo?.nombre || '');}}
@@ -65,7 +126,7 @@ const handleSubmit = () => {
                 </select>
                 <h1 className='font-bold text-3xl'>VS</h1>
                 <select name="equipo2" value={equipoId2} onChange={(e) => {
-                    const id = e.target.value;
+                    const id = Number(e.target.value)
                     setEquipoId2(id);
                     const equipo = equipos.find(eq => eq.id === id);
                     setEquipoNombre2(equipo?.nombre || '');}}
@@ -95,6 +156,18 @@ const handleSubmit = () => {
                     Aceptar
                 </button>
             </div>
+           {showAlerta && (
+  <AlertaPopUp
+    show={showAlerta}
+    onClose={() => setShowAlerta(false)}
+    title={tipoAlerta === 'success' ? 'Éxito' : 'Error en el formulario'}
+    message={mensajeAlerta}
+    type={tipoAlerta}
+    errors={erroresFormulario}
+  />
+)}
+
+
 
         </>
     )

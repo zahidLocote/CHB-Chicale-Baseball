@@ -45,8 +45,6 @@ app.post('/liga', async (req, res) => {
   try {
     const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente } = req.body
 
-    console.log('Datos recibidos:', req.body)
-
     if (!nombreLiga || !categoria || !nombrePresidente || !contactoPresidente) {
       return res.status(400).json({ 
         error: 'Todos los campos son obligatorios excepto el logo' 
@@ -232,5 +230,7 @@ app.delete('/liga/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar liga' })
   }
 })
+
+
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))
