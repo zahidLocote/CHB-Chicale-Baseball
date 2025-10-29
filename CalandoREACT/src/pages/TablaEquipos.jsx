@@ -15,7 +15,6 @@ export default function TablaEquipos() {
   const { state } = useLocation() // Obtiene datos adicionales pasados desde VentanaPrincipal
 
   useEffect(() => {
-    // Si viene la liga desde el state, úsala
     if (state?.liga) {
       setLiga(state.liga)
     } else {
@@ -68,13 +67,15 @@ export default function TablaEquipos() {
         ))}
       </div>
       <div className="flex justify-center mt-6">
-        <button
-          onClick={() => navigate('/nuevo', { state: { ligaId: id } })}
-          className="bg-green-200 text-green-800 font-semibold px-4 py-2 rounded hover:bg-green-300 cursor-pointer"
-        >
+
+      <div className="flex justify-center mt-6 gap-x-5 ">
+        <button onClick={() => navigate('equipos/nuevo')} className="bg-green-200 text-green-800 font-bold px-4 py-2 rounded hover:bg-green-300 cursor-pointer">
           Agregar Equipo
         </button>
-
+        <button onClick={() => navigate('/partidoNuevo', { state: { liga } })} className="bg-gray-300 text-gray-600 font-bold px-4 py-2 rounded hover:bg-gray-200 cursor-pointer">
+          Registrar partido
+        </button>
+      </div>
       </div>
     </>
   )

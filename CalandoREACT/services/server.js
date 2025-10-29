@@ -117,8 +117,6 @@ app.post('/liga', async (req, res) => {
   try {
     const { nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente } = req.body
 
-    console.log('Datos recibidos:', req.body)
-
     if (!nombreLiga || !categoria || !nombrePresidente || !contactoPresidente) {
       return res.status(400).json({
         error: 'Todos los campos son obligatorios excepto el logo'
@@ -471,6 +469,40 @@ app.delete('/liga/:id', async (req, res) => {
   }
 })
 
-// 🔹 INICIO DEL SERVIDOR
-app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'));
+//Registro de partidos
+app.post('/partido', async (req, res) =>{
+    try{
+        const {fecha, lugar,hora, equipoId1,equipoId2,equipoNombre1,equipoNombre2, ligaId,} = req.body
+
+        const nuevoPartido = await prisma.partido.create({
+            data: {
+                fecha,
+                lugar,
+                hora,
+                equipoId1,
+                equipoId2,
+                equipoNombre1,
+                equipoNombre2,
+                ligaId,
+            }
+        })
+
+        res.json({
+            succes: true,
+            message: 'Partido registrado correctamente.',
+            data: nuevoPartido
+        })
+
+    }catch (error) {
+        console.error('Error al crear partido:', error)
+        res.status(500).json({ 
+            error: 'Error al registrar el partido',
+            details: error.message 
+        })
+    }
+
+})
+
+
+app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))
 
