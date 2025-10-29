@@ -11,9 +11,19 @@ export async function registrarPartido(data) {
       throw new Error(`Server responded with ${response.status}: ${errorText}`);
     }
 
-    return await response.json(); // 👈 devuelve la respuesta del servidor
+    return await response.json();
   } catch (error) {
     console.error('Error en registrarPartido:', error);
     throw error;
   }
+}
+
+export async function obtenerPartidosPorLiga(ligaId) {
+  const res = await fetch(`/api/partido?ligaId=${ligaId}`);
+
+  if (!res.ok) {
+    throw new Error('Error al obtener partidos');
+  }
+
+  return await res.json();
 }
