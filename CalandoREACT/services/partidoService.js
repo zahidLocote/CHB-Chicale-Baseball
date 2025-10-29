@@ -11,7 +11,7 @@ export async function registrarPartido(data) {
       throw new Error(`Server responded with ${response.status}: ${errorText}`);
     }
 
-    return await response.json(); // 👈 devuelve la respuesta del servidor
+    return await response.json(); // devuelve la respuesta del servidor
   } catch (error) {
     console.error('Error en registrarPartido:', error);
     throw error;
