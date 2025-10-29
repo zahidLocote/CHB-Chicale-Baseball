@@ -73,7 +73,7 @@ const handleSubmit = async (e) => {
         equipoId2,
         equipoNombre1,
         equipoNombre2,
-        fecha: new Date(fechaPartido),           
+        fecha: new Date(fechaPartido),  
         lugar: direccionPartido,       
         hora: horaPartido,
         ligaId: liga?.id,
@@ -91,7 +91,6 @@ const handleSubmit = async (e) => {
         setErroresFormulario({});
         setShowAlerta(true);
 
-  // Opcional: navegar después de unos segundos
         setTimeout(() => {
             navigate(-1);
         }, 2000);
@@ -158,17 +157,16 @@ const handleSubmit = async (e) => {
                 </button>
             </div>
            {showAlerta && (
-  <AlertaPopUp
-    show={showAlerta}
-    onClose={() => setShowAlerta(false)}
-    title={tipoAlerta === 'success' ? 'Éxito' : 'Error en el formulario'}
-    message={mensajeAlerta}
-    type={tipoAlerta}
-    errors={erroresFormulario}
-  />
-)}
+                <AlertaPopUp
+                    show={showAlerta}
+                    onClose={() => setShowAlerta(false)}
+                    title={tipoAlerta === 'success' ? 'Éxito' : 'Error en el formulario'}
+                    message={mensajeAlerta}
+                    type={tipoAlerta}
+                    errors={erroresFormulario}
+                />
 
-
+                )}
 
         </>
     )

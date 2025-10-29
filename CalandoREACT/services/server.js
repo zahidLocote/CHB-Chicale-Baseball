@@ -503,6 +503,23 @@ app.post('/partido', async (req, res) =>{
 
 })
 
+//Obtener partidos por liga
+app.get('/partido', async (req, res) => {
+  const { ligaId } = req.query;
+
+  try {
+    const partidos = await prisma.partido.findMany({
+      where: ligaId ? { ligaId: Number(ligaId) } : undefined
+    });
+
+    res.json(partidos);
+  } catch (error) {
+    console.error('Error al obtener partidos:', error);
+    res.status(500).json({ error: 'Error al obtener partidos' });
+  }
+});
+
+
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))
 
