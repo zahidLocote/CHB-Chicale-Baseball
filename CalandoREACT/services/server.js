@@ -536,7 +536,65 @@ app.delete('/partido/:id', async (req, res) => {
   }
 });
 
+// Obtener partido por ID
+app.get('/partido/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!id || isNaN(id)) return res.status(400).json({ error: 'ID inválido' });
 
+  try {
+    const partido = await prisma.partido.findUnique({ where: { id } });
+    if (!partido) return res.status(404).json({ error: 'Partido no encontrado' });
+
+    res.json(partido);
+  } catch (error) {
+    console.error('Error al obtener partido por ID:', error);
+    res.status(500).json({ error: 'Error interno al obtener partido' });
+  }
+});
+
+// Editar partido por ID
+app.put('/partido/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!id || isNaN(id)) return res.status(400).json({ error: 'ID inválido' });
+
+  const {
+    fecha,
+    lugar,
+    hora,
+    jornada,
+    equipo1Id,
+    equipo2Id
+  } = req.body;
+
+  try {
+    const partidoExistente = await prisma.partido.findUnique({ where: { id } });
+    if (!partidoExistente) return res.status(404).json({ error: 'Partido no encontrado' });
+
+    const partidoActualizado = await prisma.partido.update({
+      where: { id },
+      data: {
+        fecha,
+        lugar,
+        hora,
+        jornada,
+        equipoId1: equipo1Id,
+        equipoId2: equipo2Id
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Partido actualizado correctamente.',
+      data: partidoActualizado
+    });
+  } catch (error) {
+    console.error('Error al editar partido:', error);
+    res.status(500).json({
+      error: 'Error al editar partido',
+      details: error.message
+    });
+  }
+});
 
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))
