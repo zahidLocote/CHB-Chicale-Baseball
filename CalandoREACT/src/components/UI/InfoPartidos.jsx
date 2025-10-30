@@ -1,4 +1,4 @@
-
+import { eliminarPartido } from '../../../services/partidoService';
 export default function InfoPartidos({ partido }) {
   if (!partido || partido.length === 0) {
     return (
@@ -7,7 +7,19 @@ export default function InfoPartidos({ partido }) {
       </div>
     )
   }
+    const handleEliminar = async () => {
+    const confirmar = window.confirm('¿Estás seguro de eliminar este partido?');
+    if (!confirmar) return;
 
+    try {
+      await eliminarPartido(partido.id);
+      alert('Partido eliminado correctamente');
+      window.location.reload(); // o actualiza el estado si usas useState
+    } catch (error) {
+      alert('Error al eliminar partido');
+      console.error(error);
+    }
+  };
   return (
     <div className="border border-gray-400 rounded-2xl p-5 bg-white shadow-md">
       <h2 className="text-2xl font-bold mb-2 text-center">
@@ -41,7 +53,7 @@ export default function InfoPartidos({ partido }) {
           <button className="bg-blue-300 text-blue-500 font-bold px-4 py-2 rounded-xl hover:bg-blue-200">
             Editar
           </button>
-          <button className="bg-red-300 text-red-500 font-bold px-4 py-2 rounded-xl hover:bg-red-200">
+          <button onClick={handleEliminar} className="bg-red-300 text-red-500 font-bold px-4 py-2 rounded-xl hover:bg-red-200">
             Eliminar
           </button>
         </div>
