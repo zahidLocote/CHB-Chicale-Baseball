@@ -519,6 +519,24 @@ app.get('/partido', async (req, res) => {
   }
 });
 
+// Eliminar partido por ID
+app.delete('/partido/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!id || isNaN(id)) return res.status(400).json({ error: 'ID inválido' });
+
+  try {
+    const partido = await prisma.partido.findUnique({ where: { id } });
+    if (!partido) return res.status(404).json({ error: 'Partido no encontrado' });
+
+    await prisma.partido.delete({ where: { id } });
+    res.json({ mensaje: 'Partido eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar partido:', error);
+    res.status(500).json({ error: 'Error al eliminar partido' });
+  }
+});
+
+
 
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))
