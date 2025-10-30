@@ -581,8 +581,65 @@ app.delete('/partido/:id', async (req, res) => {
   }
 });
 
+// Registrar estadísticas de jugadores
+app.post('/api/estadisticas', async (req, res) => {
+  const { equipoId, partidoId, carrerasTotales, estadisticas } = req.body;
 
+  // Validar datos mínimos
+  if (!equipoId || !partidoId || !Array.isArray(estadisticas)) {
+    return res.status(400).json({ error: 'Datos incompletos o inválidos.' });
+  }
 
+  try {
+    // Guardar estadísticas individuales de jugadores
+    const nuevasEstadisticas = await prisma.estadisticaJugador.createMany({
+      data: estadisticas.map(j => ({
+        partidoId: Number(partidoId),
+        jugadorId: Number(j.jugadorId),
+        equipoId: Number(equipoId),
+        H: j.H || 0,
+        HR: j.HR || 0,
+        H2: j.H2 || 0,
+        H3: j.H3 || 0,
+        BB: j.BB || 0,
+        K: j.K || 0,
+        BG: j.BG || 0,
+        turnosLegales: j.TL || 0
+      })),
+      skipDuplicates: true // evita duplicados del mismo jugador en el mismo partido
+    });
+
+    console.log(`✅ Se guardaron ${nuevasEstadisticas.count} registros de estadísticas.`);
+
+    // Actualizar marcador en la tabla "Partido" (score1 o score2)
+    const partido = await prisma.partido.findUnique({
+      where: { id: Number(partidoId) },
+      select: { equipoId1: true, equipoId2: true }
+    });
+
+    if (partido && typeof carrerasTotales === 'number') {
+      const campoScore =
+        partido.equipoId1 === equipoId ? 'score1' : 'score2';
+
+      await prisma.partido.update({
+        where: { id: Number(partidoId) },
+        data: { [campoScore]: carrerasTotales }
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Estadísticas registradas correctamente.',
+      count: nuevasEstadisticas.count
+    });
+  } catch (error) {
+    console.error('❌ Error al registrar estadísticas:', error);
+    res.status(500).json({
+      error: 'Error al registrar estadísticas.',
+      details: error.message
+    });
+  }
+});
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))
 

@@ -63,3 +63,10 @@ export async function obtenerJugadorPorId(id) {
 
   return await res.json();
 }
+
+//Obtener jugadores por equipo
+//export async function obtenerJugadoresPorEquipo(equipoId) {
+  //const res = await fetch(`http://localhost:3001/api/jugadores/equipo/${equipoId}`)
+  //if (!res.ok) throw new Error('Error al obtener jugadores')
+  //return res.json()
+//}

@@ -37,6 +37,7 @@ model equipo{
   ligaId Int?
   liga Liga?   @relation(fields: [ligaId], references: [id])
   jugadores jugador[]
+  estadisticasJugador EstadisticaJugador[] @relation("EquipoEstadisticas")
 }
 
 model jugador {
@@ -51,6 +52,8 @@ model jugador {
 
   equipo   equipo @relation(fields: [equipoId], references: [id])
   equipoId Int
+
+  estadisticasJugador EstadisticaJugador[] @relation("JugadorEstadisticas")
 
   @@unique([equipoId, numero]) // No permitir dos jugadores con mismo número en un equipo
 }
@@ -86,10 +89,35 @@ model Partido {
 
   ligaId         Int
   liga           Liga           @relation(fields: [ligaId], references: [id])
+
+  estadisticasJugador EstadisticaJugador[] @relation("PartidoEstadisticas")
+
 }
 enum EstadoPartido {
   PROGRAMADO
 ENVIVO
   FINALIZADO
+}
+model EstadisticaJugador {
+  id               Int      @id @default(autoincrement())
+  partidoId        Int
+  jugadorId        Int
+  equipoId         Int
+
+  H                Int      @default(0)  // Hits
+  HR               Int      @default(0)  // Home Runs
+  H2               Int      @default(0)  // Dobles
+  H3               Int      @default(0)  // Triples
+  BB               Int      @default(0)  // Bases por bolas
+  K                Int      @default(0)  // Strikeouts
+  BG               Int      @default(0)  // Bases ganadas
+  turnosLegales    Int      @default(0)
+
+  partido          Partido  @relation("PartidoEstadisticas", fields: [partidoId], references: [id], onDelete: Cascade)
+  jugador          jugador  @relation("JugadorEstadisticas", fields: [jugadorId], references: [id])
+  equipo           equipo   @relation("EquipoEstadisticas", fields: [equipoId], references: [id])
+
+
+  @@unique([partidoId, jugadorId]) // Evita duplicar estadísticas del mismo jugador en el mismo partido
 }
 

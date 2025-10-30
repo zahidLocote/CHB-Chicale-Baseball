@@ -1,6 +1,6 @@
 // src/services/partidoService.js
 
-const BASE_URL = 'http://localhost:3001'; // Asegúrate que tu backend corre en este puerto
+const BASE_URL = 'http://localhost:3001'; 
 
 // Registrar un nuevo partido
 export async function registrarPartido(data) {
@@ -57,3 +57,5 @@ export async function eliminarPartido(id) {
     throw error;
   }
 }
+
+
