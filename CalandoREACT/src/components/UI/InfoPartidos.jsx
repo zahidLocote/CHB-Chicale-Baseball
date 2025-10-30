@@ -1,8 +1,10 @@
 import ModalResultados from '../modals/ModalResultados';
 import { eliminarPartido } from '../../../services/partidoService';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function InfoPartidos({ partido }) {
+  const navigate = useNavigate();
   const [mostrarModal, setMostrarModal] = useState(false);
   const [equipoActual, setEquipoActual] = useState(1)
 
@@ -72,7 +74,7 @@ export default function InfoPartidos({ partido }) {
               Finalizar
             </button>
             <button
-              onClick={() => navigate('/partido/editar/${partido.id}')}
+              onClick={() => navigate(`/partido/editar/${partido.id}`)}
               className="bg-blue-300 text-blue-500 font-bold px-4 py-2 rounded-xl hover:bg-blue-200"
             >
               Editar
