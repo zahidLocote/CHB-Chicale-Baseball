@@ -85,8 +85,8 @@ export default function EditarPartido() {
     }
 
     const datos = {
-      equipo1Id: equipoId1,
-      equipo2Id: equipoId2,
+      equipoId1: equipoId1,
+      equipoId2: equipoId2,
       equipoNombre1,
       equipoNombre2,
       fecha: new Date(fechaPartido),
@@ -127,6 +127,7 @@ export default function EditarPartido() {
           setEquipoId1(id);
           const equipo = equipos.find(eq => eq.id === id);
           setEquipoNombre1(equipo?.nombre || '');
+          console.log(equipo.nombre);
         }} className="font-bold w-50 px-4 py-2 border border-gray-300 rounded-md shadow-sm">
           <option value="">- Elige un equipo -</option>
           {equipos.map((equipo) => (

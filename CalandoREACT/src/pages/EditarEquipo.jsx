@@ -11,7 +11,7 @@ export default function EditarEquipo() {
 
     const [nombre, setNombre] = useState('')
     const [entrenador, setEntrenador] = useState('')
-    const [ligaId, setLigaId] = useState('1')
+    const [ligaId, setLigaId] = useState(null)
     const [ligas, setLigas] = useState([])
     const [logo, setLogo] = useState(null)
     const logoFinal = typeof logo === 'string' && logo.trim() !== '' ? logo : null

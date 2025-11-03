@@ -223,7 +223,7 @@ app.get('/equipos', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener equipos:', error);
     res.status(500).json({ error: 'Error al obtener equipos' });
-  } 
+  }
 });
 
 
@@ -515,36 +515,36 @@ app.delete('/liga/:id', async (req, res) => {
 })
 
 //Registro de partidos
-app.post('/partido', async (req, res) =>{
-    try{
-        const {fecha, lugar,hora, equipoId1,equipoId2,equipoNombre1,equipoNombre2, ligaId,} = req.body
+app.post('/partido', async (req, res) => {
+  try {
+    const { fecha, lugar, hora, equipoId1, equipoId2, equipoNombre1, equipoNombre2, ligaId, } = req.body
 
-        const nuevoPartido = await prisma.partido.create({
-            data: {
-                fecha,
-                lugar,
-                hora,
-                equipoId1,
-                equipoId2,
-                equipoNombre1,
-                equipoNombre2,
-                ligaId,
-            }
-        })
+    const nuevoPartido = await prisma.partido.create({
+      data: {
+        fecha,
+        lugar,
+        hora,
+        equipoId1,
+        equipoId2,
+        equipoNombre1,
+        equipoNombre2,
+        ligaId,
+      }
+    })
 
-        res.json({
-            succes: true,
-            message: 'Partido registrado correctamente.',
-            data: nuevoPartido
-        })
+    res.json({
+      succes: true,
+      message: 'Partido registrado correctamente.',
+      data: nuevoPartido
+    })
 
-    }catch (error) {
-        console.error('Error al crear partido:', error)
-        res.status(500).json({ 
-            error: 'Error al registrar el partido',
-            details: error.message 
-        })
-    }
+  } catch (error) {
+    console.error('Error al crear partido:', error)
+    res.status(500).json({
+      error: 'Error al registrar el partido',
+      details: error.message
+    })
+  }
 
 })
 
@@ -602,13 +602,15 @@ app.put('/partido/:id', async (req, res) => {
   if (!id || isNaN(id)) return res.status(400).json({ error: 'ID inválido' });
 
   const {
+    equipoId1,
+    equipoId2,
+    equipoNombre1,
+    equipoNombre2,
     fecha,
     lugar,
     hora,
-    jornada,
-    equipo1Id,
-    equipo2Id
-  } = req.body;
+    estado,
+  } = req.body
 
   try {
     const partidoExistente = await prisma.partido.findUnique({ where: { id } });
@@ -617,12 +619,14 @@ app.put('/partido/:id', async (req, res) => {
     const partidoActualizado = await prisma.partido.update({
       where: { id },
       data: {
+        equipoId1,
+        equipoId2,
+        equipoNombre1,
+        equipoNombre2,
         fecha,
         lugar,
         hora,
-        jornada,
-        equipoId1: equipo1Id,
-        equipoId2: equipo2Id
+        estado,
       }
     });
 
