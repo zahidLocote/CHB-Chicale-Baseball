@@ -60,6 +60,10 @@ export async function obtenerEquiposPorLiga(ligaId) {
   return await res.json();
 }
 
-
+export async function obtenerEstadisticasPorLiga(ligaId) {
+  const response = await fetch(`/api/estadisticas/equipos/${ligaId}`)
+  if (!response.ok) throw new Error("Error al obtener estadísticas")
+  return response.json()
+}
 
 
