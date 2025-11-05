@@ -74,14 +74,28 @@ export default function DetalleJugador() {
         >
           Eliminar
         </button>
-
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-gray-400 text-white px-5 py-2 rounded hover:bg-gray-500"
-        >
-          Volver
-        </button>
-      </div >
-    </div >
+      </div>
+      <h1 className="text-center font-bold text-2xl mt-5">Historial</h1>
+      <table className=" text-center min-w-full  bg-gray-100 border rounded-lg overflow-hidden">
+        <thead className="bg-blue-900 text-white">
+            <tr>
+              <th className="py-3 px-4 text-left">H</th>
+              <th className="py-3 px-4 text-left">HR</th>
+              <th className="py-3 px-4 text-left">H2</th>
+              <th className="py-3 px-4 text-left">H3</th>
+              <th className="py-3 px-4 text-left">BB</th>
+              <th className="py-3 px-4 text-left">BG</th>
+              <th className="py-3 px-4 text-left">TL</th>
+              <th className="py-3 px-4 text-left">S</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>o</td>
+              <td>o</td>
+            </tr>
+          </tbody>
+      </table>
+    </div>
   );
 }
