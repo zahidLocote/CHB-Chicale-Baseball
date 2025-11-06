@@ -1,18 +1,29 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import placeholderfoto from "../assets/placeholderfoto.jpg";
-import { obtenerJugadorPorId } from "../../services/jugadorService";
-import { eliminarJugador } from "../../services/jugadorService";
+import { obtenerJugadorPorId, eliminarJugador } from "../../services/jugadorService";
+import { obtenerEstadisticasTotales } from "../../services/estadisticaService";
 
 export default function DetalleJugador() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [jugador, setJugador] = useState(null);
+  const [estadisticas, setEstadisticas] = useState(null)
 
   useEffect(() => {
-    obtenerJugadorPorId(id)
-      .then(data => setJugador(data))
-      .catch(error => console.error('Error al cargar jugador:', error));
+    async function cargarDatos() {
+      try {
+        const dataJugador = await obtenerJugadorPorId(id);
+        setJugador(dataJugador);
+
+        // 🔹 Obtiene las estadísticas totales del jugador
+        const dataEstadisticas = await obtenerEstadisticasTotales(id);
+        setEstadisticas(dataEstadisticas);
+      } catch (error) {
+        console.error("Error al cargar datos:", error);
+      }
+    }
+    cargarDatos();
   }, [id]);
 
   if (!jugador) return <p className="text-center mt-8">Cargando jugador...</p>;
@@ -90,11 +101,25 @@ export default function DetalleJugador() {
             </tr>
           </thead>
           <tbody>
+          {estadisticas ? (
             <tr>
-              <td>o</td>
-              <td>o</td>
+              <td className="py-2">{estadisticas.H}</td>
+              <td className="py-2">{estadisticas.HR}</td>
+              <td className="py-2">{estadisticas.H2}</td>
+              <td className="py-2">{estadisticas.H3}</td>
+              <td className="py-2">{estadisticas.BB}</td>
+              <td className="py-2">{estadisticas.BG}</td>
+              <td className="py-2">{estadisticas.turnosLegales}</td>
+              <td className="py-2">{estadisticas.S}</td>
             </tr>
-          </tbody>
+          ) : (
+            <tr>
+              <td colSpan="8" className="py-4 text-gray-500">
+                No hay estadisticas...
+              </td>
+            </tr>
+          )}
+        </tbody>
       </table>
     </div>
   );
