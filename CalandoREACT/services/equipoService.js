@@ -56,10 +56,16 @@ export async function obtenerEquiposPorLiga(ligaId) {
   if (!res.ok) {
     throw new Error('Error al obtener equipos por liga');
   }
-  
+
   return await res.json();
 }
 
+const BASE_URL = 'http://localhost:3001';
 
+export async function obtenerEstadisticasPorLiga(ligaId) {
+  const response = await fetch(`${BASE_URL}/api/estadisticas/equipos/${ligaId}`);
+  if (!response.ok) throw new Error("Error al obtener estadísticas");
+  return response.json();
+}
 
 

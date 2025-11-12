@@ -80,19 +80,6 @@ app.post('/equipos', async (req, res) => {
   }
 });
 
-// Obtener todos los equipos
-/*app.get('/equipos', async (req, res) => {
-  try {
-    const equipos = await prisma.equipo.findMany({
-      include: { liga: true, jugadores: true }
-    });
-    res.json(equipos);
-  } catch (error) {
-    console.error('Error al obtener equipos:', error);
-    res.status(500).json({ error: 'Error al obtener equipos' });
-  }
-});*/
-
 // Obtener equipo por ID
 app.get('/equipos/:id', async (req, res) => {
   const id = Number(req.params.id);
@@ -700,6 +687,91 @@ app.post('/api/estadisticas', async (req, res) => {
       error: 'Error al registrar estadísticas.',
       details: error.message
     });
+  }
+});
+// Tabla de posiciones por liga (desde la tabla Partido)
+app.get('/api/estadisticas/equipos/:ligaId', async (req, res) => {
+  const ligaId = Number(req.params.ligaId);
+
+  try {
+    // Tomamos SOLO partidos finalizados de esa liga
+    const partidos = await prisma.partido.findMany({
+      where: {
+        ligaId,
+        estado: 'FINALIZADO',
+      },
+      select: {
+        equipoId1: true,
+        equipoNombre1: true,
+        score1: true,
+        equipoId2: true,
+        equipoNombre2: true,
+        score2: true,
+      },
+    });
+
+    // Acumulador por equipo
+    const tabla = new Map(); // key: equipoId, value: stats
+
+    const ensureTeam = (id, nombre) => {
+      if (!tabla.has(id)) {
+        tabla.set(id, {
+          equipo: nombre,
+          G: 0,
+          P: 0,
+          RS: 0,
+          RA: 0,
+        });
+      }
+      return tabla.get(id);
+    };
+
+    for (const p of partidos) {
+      const t1 = ensureTeam(p.equipoId1, p.equipoNombre1);
+      const t2 = ensureTeam(p.equipoId2, p.equipoNombre2);
+
+      const s1 = Number(p.score1 ?? 0);
+      const s2 = Number(p.score2 ?? 0);
+
+      // Carreras anotadas/recibidas
+      t1.RS += s1; t1.RA += s2;
+      t2.RS += s2; t2.RA += s1;
+
+      // Ganado/Perdido
+      if (s1 > s2) { t1.G++; t2.P++; }
+      else if (s2 > s1) { t2.G++; t1.P++; }
+      // Si empates no existen, ignoramos el caso s1===s2
+    }
+
+    // Convertimos a arreglo con los campos que espera tu tabla
+    const rows = Array.from(tabla.values()).map(t => {
+      const juegos = t.G + t.P;
+      const Porcentaje = juegos ? (t.G / juegos).toFixed(3) : '0.000';
+      const DiffNum = t.RS - t.RA;
+      const Diff = DiffNum >= 0 ? `+${DiffNum}` : `${DiffNum}`;
+      const RAVG = juegos ? (t.RS / juegos).toFixed(2) : '0.00';
+      const PTS = t.G * 2; // ajusta si usas otro sistema
+
+      return {
+        equipo: t.equipo,
+        G: t.G,
+        P: t.P,
+        Porcentaje,
+        RS: t.RS,
+        RA: t.RA,
+        Diff,
+        RAVG,
+        PTS,
+      };
+    });
+
+    // Ordena por % (desc) y luego por Diff
+    rows.sort((a, b) => Number(b.Porcentaje) - Number(a.Porcentaje) || parseInt(b.Diff) - parseInt(a.Diff));
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error al calcular estadísticas:', error);
+    res.status(500).json({ error: 'Error al obtener estadísticas' });
   }
 });
 
