@@ -151,22 +151,6 @@ export default function TablaEquipos() {
           </div>
         )}
       </div>
-
-      {/* Botones inferiores */}
-      <div className="flex justify-center mb-5 gap-x-5 ">
-        <button
-          onClick={() => navigate('/nuevo', { state: { ligaId: liga?.id } })}
-          className="bg-green-200 text-green-800 font-bold px-4 py-2 rounded hover:bg-green-300 cursor-pointer"
-        >
-          Agregar Equipo
-        </button>
-        <button
-          onClick={() => navigate('/partidoNuevo', { state: { liga } })}
-          className="bg-gray-300 text-gray-600 font-bold px-4 py-2 rounded hover:bg-gray-200 cursor-pointer"
-        >
-          Registrar partido
-        </button>
-      </div>
     </>
   )
 }
