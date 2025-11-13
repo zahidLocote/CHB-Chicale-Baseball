@@ -60,12 +60,18 @@ export default function TablaEquipos() {
 
   return (
     <>
-      <button onClick={() => navigate(-1)} className="text-xl text-blue-500 underline hover:text-blue-800 ml-50">
+      <button 
+        onClick={() => navigate(-1)} 
+        className="text-xl text-blue-500 underline hover:text-blue-800 ml-50"
+      >
         ← Volver
       </button>
 
-      <h1 className='text-center text-3xl font-bold'>Equipos en la liga {liga?.nombreLiga}</h1>
+      <h1 className='text-center text-3xl font-bold'>
+        Equipos en la liga {liga?.nombreLiga}
+      </h1>
 
+      {/* Tarjetas de equipos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
         {equipos.map((equipo) => (
           <div key={equipo.id} onClick={() => navigate(`/equipos/${equipo.id}`)} className="cursor-pointer">
@@ -79,6 +85,7 @@ export default function TablaEquipos() {
         ))}
       </div>
 
+      {/* Botones superiores */}
       <div className="flex justify-center mt-6 gap-x-5">
         <button
           onClick={() => navigate('/nuevo', { state: { ligaId: liga?.id } })}
@@ -94,6 +101,7 @@ export default function TablaEquipos() {
         </button>
       </div>
 
+      {/* Estadísticas */}
       <h1 className='text-center text-3xl font-bold mt-10 mb-6'>- Estadísticas por equipo -</h1>
       <div className="overflow-x-auto mb-10">
         <table className="min-w-full border border-gray-300 text-sm text-center bg-white shadow-md">
@@ -128,6 +136,7 @@ export default function TablaEquipos() {
         </table>
       </div>
 
+      {/* Partidos */}
       <h1 className='text-center text-3xl font-bold mb-10'>- Partidos -</h1>
       <div>
         {partidos.length === 0 ? (
@@ -141,6 +150,22 @@ export default function TablaEquipos() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Botones inferiores */}
+      <div className="flex justify-center mb-5 gap-x-5 ">
+        <button
+          onClick={() => navigate('/nuevo', { state: { ligaId: liga?.id } })}
+          className="bg-green-200 text-green-800 font-bold px-4 py-2 rounded hover:bg-green-300 cursor-pointer"
+        >
+          Agregar Equipo
+        </button>
+        <button
+          onClick={() => navigate('/partidoNuevo', { state: { liga } })}
+          className="bg-gray-300 text-gray-600 font-bold px-4 py-2 rounded hover:bg-gray-200 cursor-pointer"
+        >
+          Registrar partido
+        </button>
       </div>
     </>
   )

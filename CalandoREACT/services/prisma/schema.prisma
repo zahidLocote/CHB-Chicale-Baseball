@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -13,11 +10,13 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
 model presidente{
   id Int @id @default(autoincrement())
   nombre String
   contacto String
 }
+
 model Liga{
   id Int @id @default(autoincrement())
   nombreLiga String
@@ -29,6 +28,7 @@ model Liga{
   equipo               equipo[]
   partido              Partido[]
 }
+
 model equipo{
   id  Int @id @default(autoincrement())
   nombre String
@@ -37,7 +37,8 @@ model equipo{
   ligaId Int?
   liga Liga?   @relation(fields: [ligaId], references: [id])
   jugadores jugador[]
-  estadisticasJugador EstadisticaJugador[] @relation("EquipoEstadisticas")
+  estadisticasJugador EstadisticaJugador[]
+  estadisticasTotales EstadisticaJugadorTotal[]
 }
 
 model jugador {
@@ -53,7 +54,8 @@ model jugador {
   equipo   equipo @relation(fields: [equipoId], references: [id])
   equipoId Int
 
-  estadisticasJugador EstadisticaJugador[] @relation("JugadorEstadisticas")
+  estadisticasJugador EstadisticaJugador[]
+  estadisticasTotales EstadisticaJugadorTotal[]
 
   @@unique([equipoId, numero]) // No permitir dos jugadores con mismo número en un equipo
 }
@@ -72,7 +74,6 @@ enum Posicion {
   SUB  // Suplente
 }
 
-
 model Partido {
   id               Int      @id @default(autoincrement())
   fecha            DateTime
@@ -90,14 +91,15 @@ model Partido {
   ligaId         Int
   liga           Liga           @relation(fields: [ligaId], references: [id])
 
-  estadisticasJugador EstadisticaJugador[] @relation("PartidoEstadisticas")
-
+  estadisticasJugador EstadisticaJugador[]
 }
+
 enum EstadoPartido {
   PROGRAMADO
-ENVIVO
+  ENVIVO
   FINALIZADO
 }
+
 model EstadisticaJugador {
   id               Int      @id @default(autoincrement())
   partidoId        Int
@@ -109,15 +111,34 @@ model EstadisticaJugador {
   H2               Int      @default(0)  // Dobles
   H3               Int      @default(0)  // Triples
   BB               Int      @default(0)  // Bases por bolas
-  K                Int      @default(0)  // Strikeouts
   BG               Int      @default(0)  // Bases ganadas
   turnosLegales    Int      @default(0)
+  S                Int      @default(0)  // Sacrificios
 
-  partido          Partido  @relation("PartidoEstadisticas", fields: [partidoId], references: [id], onDelete: Cascade)
-  jugador          jugador  @relation("JugadorEstadisticas", fields: [jugadorId], references: [id])
-  equipo           equipo   @relation("EquipoEstadisticas", fields: [equipoId], references: [id])
+  partido          Partido  @relation(fields: [partidoId], references: [id], onDelete: Cascade)
+  jugador          jugador  @relation(fields: [jugadorId], references: [id], onDelete: Cascade)
+  equipo           equipo   @relation(fields: [equipoId], references: [id], onDelete: Cascade)
 
-
-  @@unique([partidoId, jugadorId]) // Evita duplicar estadísticas del mismo jugador en el mismo partido
+  @@unique([partidoId, jugadorId])
+  @@index([jugadorId])
+  @@index([equipoId])
 }
 
+model EstadisticaJugadorTotal {
+  id             Int      @id @default(autoincrement())
+  jugadorId      Int
+  equipoId       Int
+  H              Int      @default(0)
+  HR             Int      @default(0)
+  H2             Int      @default(0)
+  H3             Int      @default(0)
+  BB             Int      @default(0)
+  BG             Int      @default(0)
+  turnosLegales  Int      @default(0)
+  S              Int      @default(0)
+  
+  jugador        jugador  @relation(fields: [jugadorId], references: [id], onDelete: Cascade)
+  equipo         equipo   @relation(fields: [equipoId], references: [id], onDelete: Cascade)
+  
+  @@unique([jugadorId, equipoId])
+}

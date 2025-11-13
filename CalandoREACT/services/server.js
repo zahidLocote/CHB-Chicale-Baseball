@@ -630,62 +630,152 @@ app.put('/partido/:id', async (req, res) => {
     });
   }
 });
+
 // Registrar estadísticas de jugadores
 app.post('/api/estadisticas', async (req, res) => {
   const { equipoId, partidoId, carrerasTotales, estadisticas } = req.body;
 
-  // Validar datos mínimos
   if (!equipoId || !partidoId || !Array.isArray(estadisticas)) {
     return res.status(400).json({ error: 'Datos incompletos o inválidos.' });
   }
 
   try {
-    // Guardar estadísticas individuales de jugadores
-    const nuevasEstadisticas = await prisma.estadisticaJugador.createMany({
-      data: estadisticas.map(j => ({
-        partidoId: Number(partidoId),
-        jugadorId: Number(j.jugadorId),
-        equipoId: Number(equipoId),
-        H: j.H || 0,
-        HR: j.HR || 0,
-        H2: j.H2 || 0,
-        H3: j.H3 || 0,
-        BB: j.BB || 0,
-        K: j.K || 0,
-        BG: j.BG || 0,
-        turnosLegales: j.TL || 0
-      })),
-      skipDuplicates: true // evita duplicados del mismo jugador en el mismo partido
-    });
+    const resultado = await prisma.$transaction(async (tx) => {
+      const resultados = {
+        partidoGuardado: 0,
+        totalesActualizados: 0
+      };
 
-    console.log(`✅ Se guardaron ${nuevasEstadisticas.count} registros de estadísticas.`);
+      //Guardar estadísticas del partido (historial)
+      for (const stat of estadisticas) {
+        const partidoIdNum = Number(partidoId);
+        const jugadorIdNum = Number(stat.jugadorId);
+        const equipoIdNum = Number(equipoId);
 
-    // Actualizar marcador en la tabla "Partido" (score1 o score2)
-    const partido = await prisma.partido.findUnique({
-      where: { id: Number(partidoId) },
-      select: { equipoId1: true, equipoId2: true }
-    });
+        // Verificar si ya existe
+        const existe = await tx.estadisticaJugador.findFirst({
+          where: {
+            AND: [
+              { partidoId: partidoIdNum },
+              { jugadorId: jugadorIdNum }
+            ]
+          }
+        });
 
-    if (partido && typeof carrerasTotales === 'number') {
-      const campoScore =
-        partido.equipoId1 === equipoId ? 'score1' : 'score2';
+        if (existe) {
+          // Actualizar existente
+          await tx.estadisticaJugador.update({
+            where: { id: existe.id },
+            data: {
+              H: stat.H || 0,
+              HR: stat.HR || 0,
+              H2: stat.H2 || 0,
+              H3: stat.H3 || 0,
+              BB: stat.BB || 0,
+              BG: stat.BG || 0,
+              turnosLegales: stat.TL || 0,
+              S: stat.S || 0
+            }
+          });
+        } else {
+          // Crea nuevo
+          await tx.estadisticaJugador.create({
+            data: {
+              partidoId: partidoIdNum,
+              jugadorId: jugadorIdNum,
+              equipoId: equipoIdNum,
+              H: stat.H || 0,
+              HR: stat.HR || 0,
+              H2: stat.H2 || 0,
+              H3: stat.H3 || 0,
+              BB: stat.BB || 0,
+              BG: stat.BG || 0,
+              turnosLegales: stat.TL || 0,
+              S: stat.S || 0
+            }
+          });
+        }
+        resultados.partidoGuardado++;
+      }
 
-      await prisma.partido.update({
-        where: { id: Number(partidoId) },
-        data: { [campoScore]: carrerasTotales }
+      for (const stat of estadisticas) {
+        const jugadorIdNum = Number(stat.jugadorId);
+        const equipoIdNum = Number(equipoId);
+
+        // Buscar total existente
+        const totalExiste = await tx.estadisticaJugadorTotal.findFirst({
+          where: {
+            AND: [
+              { jugadorId: jugadorIdNum },
+              { equipoId: equipoIdNum }
+            ]
+          }
+        });
+
+        if (totalExiste) {
+          // SUMAR a totales existentes
+          await tx.estadisticaJugadorTotal.update({
+            where: { id: totalExiste.id },
+            data: {
+              H: totalExiste.H + (stat.H || 0),
+              HR: totalExiste.HR + (stat.HR || 0),
+              H2: totalExiste.H2 + (stat.H2 || 0),
+              H3: totalExiste.H3 + (stat.H3 || 0),
+              BB: totalExiste.BB + (stat.BB || 0),
+              BG: totalExiste.BG + (stat.BG || 0),
+              turnosLegales: totalExiste.turnosLegales + (stat.TL || 0),
+              S: totalExiste.S + (stat.S || 0)
+            }
+          });
+        } else {
+          // Crear primer registro total
+          await tx.estadisticaJugadorTotal.create({
+            data: {
+              jugadorId: jugadorIdNum,
+              equipoId: equipoIdNum,
+              H: stat.H || 0,
+              HR: stat.HR || 0,
+              H2: stat.H2 || 0,
+              H3: stat.H3 || 0,
+              BB: stat.BB || 0,
+              BG: stat.BG || 0,
+              turnosLegales: stat.TL || 0,
+              S: stat.S || 0
+            }
+          });
+        }
+        resultados.totalesActualizados++;
+      }
+
+      //Actualizar marcador del partido
+      const partido = await tx.partido.findUnique({
+        where: { id: Number(partidoId) }
       });
-    }
+
+      if (partido && typeof carrerasTotales === 'number') {
+        const campoScore = partido.equipoId1 === Number(equipoId) ? 'score1' : 'score2';
+        
+        await tx.partido.update({
+          where: { id: Number(partidoId) },
+          data: { [campoScore]: carrerasTotales }
+        });
+      }
+
+      return resultados;
+    });
 
     res.json({
       success: true,
-      message: 'Estadísticas registradas correctamente.',
-      count: nuevasEstadisticas.count
+      message: '✅ Estadísticas registradas y acumuladas correctamente',
+      ...resultado
     });
+
   } catch (error) {
-    console.error('❌ Error al registrar estadísticas:', error);
+    console.error('❌ Error completo:', error);
     res.status(500).json({
-      error: 'Error al registrar estadísticas.',
-      details: error.message
+      error: 'Error al registrar estadísticas',
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });
@@ -774,5 +864,36 @@ app.get('/api/estadisticas/equipos/:ligaId', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener estadísticas' });
   }
 });
+
+//Estadisticas globales del jugador
+app.get('/api/estadisticas/jugador', async (req, res) => {
+  const { jugadorId, equipoId } = req.query;
+
+  if (!jugadorId) {
+    return res.status(400).json({ error: 'El jugadorId es obligatorio' });
+  }
+
+  try {
+    const whereClause = {
+      jugadorId: Number(jugadorId),
+      ...(equipoId && { equipoId: Number(equipoId) })
+    };
+
+    const estadistica = await prisma.estadisticaJugadorTotal.findFirst({
+      where: whereClause,
+      include: { jugador: true, equipo: true }
+    });
+
+    if (!estadistica) {
+      return res.status(404).json({ error: 'No se encontraron estadísticas para este jugador.' });
+    }
+
+    res.json(estadistica);
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({ error: 'Error al obtener estadísticas.' });
+  }
+});
+
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'))
