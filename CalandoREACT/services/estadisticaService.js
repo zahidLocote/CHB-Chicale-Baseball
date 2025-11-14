@@ -40,3 +40,23 @@ export async function obtenerTablaPorLiga(ligaId) {
 
   return res.json();
 }
+// Obtener historial por partido
+export async function obtenerHistorialJugador(jugadorId) {
+  const res = await fetch(`${BASE_URL}/historial/${jugadorId}`);
+
+  if (!res.ok) throw new Error("Error al obtener historial");
+
+  return res.json();
+}
+// Editar estadística por partido
+export async function editarEstadisticaPartido(id, datos) {
+  const res = await fetch(`${BASE_URL}/historial/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos)
+  });
+
+  if (!res.ok) throw new Error("Error al editar estadística");
+
+  return res.json();
+}

@@ -16,8 +16,6 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
-
-
 const ZONA = 'America/Tijuana';
 let isRunning = false; //
 
@@ -58,7 +56,6 @@ cron.schedule('* * * * *', async () => {
     isRunning = false;
   }
 }, { timezone: ZONA });
-
 
 // Rutas
 app.use("/api/jugadores", jugadoresRouter);

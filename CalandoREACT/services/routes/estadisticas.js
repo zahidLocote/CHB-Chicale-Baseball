@@ -227,5 +227,42 @@ router.get('/jugador', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener estadísticas.' });
   }
 });
+// Obtener historial por partido de un jugador
+router.get('/historial/:jugadorId', async (req, res) => {
+  const jugadorId = Number(req.params.jugadorId);
+
+  try {
+    const historial = await prisma.estadisticaJugador.findMany({
+      where: { jugadorId },
+      include: {
+        partido: true
+      },
+      orderBy: {
+        partidoId: 'asc'
+      }
+    });
+
+    res.json(historial);
+  } catch (error) {
+    console.error("Error al obtener historial:", error);
+    res.status(500).json({ error: "Error al obtener historial del jugador" });
+  }
+});
+// Editar estadísticas de un partido
+router.put('/historial/:id', async (req, res) => {
+  const id = Number(req.params.id);
+
+  try {
+    const updated = await prisma.estadisticaJugador.update({
+      where: { id },
+      data: req.body
+    });
+
+    res.json(updated);
+  } catch (error) {
+    console.error("Error al editar estadística:", error);
+    res.status(500).json({ error: "Error al editar estadística del jugador" });
+  }
+});
 
 export default router;
