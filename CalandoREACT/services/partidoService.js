@@ -1,13 +1,9 @@
-
-// src/services/partidoService.js
-
-const BASE_URL = 'http://localhost:3001'; 
-
+const BASE_URL = 'http://localhost:3001/api/partidos';
 
 // Registrar un nuevo partido
 export async function registrarPartido(data) {
   try {
-    const response = await fetch(`${BASE_URL}/partido`, {
+    const response = await fetch(BASE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -24,11 +20,10 @@ export async function registrarPartido(data) {
     throw error;
   }
 }
-
 // Obtener partidos por liga
 export async function obtenerPartidosPorLiga(ligaId) {
   try {
-    const res = await fetch(`${BASE_URL}/partido?ligaId=${ligaId}`);
+    const res = await fetch(`${BASE_URL}?ligaId=${ligaId}`);
     if (!res.ok) throw new Error('Error al obtener partidos');
     return await res.json();
   } catch (error) {
@@ -36,11 +31,10 @@ export async function obtenerPartidosPorLiga(ligaId) {
     throw error;
   }
 }
-
 // Obtener partido por ID
 export async function obtenerPartidoPorId(id) {
   try {
-    const res = await fetch(`${BASE_URL}/partido/${id}`);
+    const res = await fetch(`${BASE_URL}/${id}`);
     if (!res.ok) throw new Error('Error al obtener partido');
     return await res.json();
   } catch (error) {
@@ -48,11 +42,10 @@ export async function obtenerPartidoPorId(id) {
     throw error;
   }
 }
-
 // Editar partido por ID
 export async function editarPartido(id, data) {
   try {
-    const res = await fetch(`${BASE_URL}/partido/${id}`, {
+    const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -69,11 +62,10 @@ export async function editarPartido(id, data) {
     throw error;
   }
 }
-
 // Eliminar partido por ID
 export async function eliminarPartido(id) {
   try {
-    const res = await fetch(`${BASE_URL}/partido/${id}`, {
+    const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'DELETE',
     });
 
@@ -88,5 +80,3 @@ export async function eliminarPartido(id) {
     throw error;
   }
 }
-
-

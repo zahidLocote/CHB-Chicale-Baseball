@@ -1,5 +1,6 @@
 const BASE_URL = 'http://localhost:3001/api/jugadores';
 
+// Crear jugador
 export async function crearJugador(jugador) {
   const res = await fetch(BASE_URL, {
     method: 'POST',
@@ -14,7 +15,7 @@ export async function crearJugador(jugador) {
 
   return await res.json();
 }
-
+// Obtener jugadores de un equipo
 export async function obtenerJugadoresPorEquipo(equipoId) {
   const res = await fetch(`${BASE_URL}/equipo/${equipoId}`);
 
@@ -24,7 +25,7 @@ export async function obtenerJugadoresPorEquipo(equipoId) {
 
   return await res.json();
 }
-
+// Eliminar jugador
 export async function eliminarJugador(id) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'DELETE'
@@ -37,7 +38,7 @@ export async function eliminarJugador(id) {
 
   return await res.json();
 }
-
+// Editar jugador
 export async function editarJugador(id, datosActualizados) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'PUT',
@@ -52,7 +53,7 @@ export async function editarJugador(id, datosActualizados) {
 
   return await res.json();
 }
-
+// Obtener jugador por ID
 export async function obtenerJugadorPorId(id) {
   const res = await fetch(`${BASE_URL}/${id}`);
 
@@ -63,10 +64,3 @@ export async function obtenerJugadorPorId(id) {
 
   return await res.json();
 }
-
-//Obtener jugadores por equipo
-//export async function obtenerJugadoresPorEquipo(equipoId) {
-  //const res = await fetch(`http://localhost:3001/api/jugadores/equipo/${equipoId}`)
-  //if (!res.ok) throw new Error('Error al obtener jugadores')
-  //return res.json()
-//}
