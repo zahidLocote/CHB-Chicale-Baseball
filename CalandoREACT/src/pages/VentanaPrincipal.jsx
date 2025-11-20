@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import EliminarPopUp from "../components/UI/eliminarPopUp";
 import { eliminarLiga } from "../../services/ligaService";
 import Banner from "../components/UI/Banner";
-
+import Slideshow from "../components/UI/Slideshow";
 
 export default function VentanaPrincipal(){
     const [ligas, setLigas] = useState([])
@@ -57,7 +57,8 @@ export default function VentanaPrincipal(){
     return(
         <>
         <Banner />
-            <h1 className="text-center font-bold text-3xl mb-6">Consulta de Ligas</h1>
+        <Slideshow/>
+            <h1 className="text-center font-bold text-3xl mb-6 font-race mt-12">Ligas</h1>
             
             <div className="grid grid-cols-4 gap-6 p-4">
                 {ligas.map(liga => {

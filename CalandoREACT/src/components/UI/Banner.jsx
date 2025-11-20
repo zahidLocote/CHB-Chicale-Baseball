@@ -23,18 +23,18 @@ export default function Banner() {
 
   return (
     <div
-      className="w-full text-white py-3 px-6 mb-6 shadow-md flex items-center"
+      className="w-full text-white h-[100px] px-6 mb-6 shadow-md flex items-center"
       style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
     >
       {/* Logo a la izquierda */}
       <img
         src={chicalisLogo}
         alt="Logo Chicalis"
-        className="h-35 w-30 rounded-full"
+        className="h-20 w-18 rounded-full"
       />
 
       {/* Botón desplegable de ligas */}
-      <div className="relative flex justify-start ml-60 h-[140px]">
+      <div className="relative flex justify-start ml-60 h-[90px]">
         <button
           onClick={() => setMostrarLigas(!mostrarLigas)}
           className="text-white text-4xl px-2 py-4 hover:bg-black/20 bg-transparent transition-opacity btn-race text-center border-l-2 border-r-2 border-black/20"
@@ -76,7 +76,7 @@ export default function Banner() {
           alt="City"
           className="h-24 w-auto absolute"
           style={{
-            top: '68px',   // mueve verticalmente (Y)
+            top: '15px',   // mueve verticalmente (Y)
             right: '30px', // mueve horizontalmente desde el borde derecho (X)
           }}
         />
