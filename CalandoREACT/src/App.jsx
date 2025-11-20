@@ -10,7 +10,8 @@ import EditarJugador from './pages/EditarJugador';
 import EditarLiga from './pages/EditarLiga'
 import TablaEquipos from './pages/TablaEquipos'
 import AltaPartido from './pages/AltaPartido'
-import EditarPartido from './pages/EditarPartido'; // o './components/UI/EditarPartido'
+import EditarPartido from './pages/EditarPartido';
+import LogIn from './pages/LogIn'
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
         <Route path="/partidoNuevo" element={<AltaPartido/>}/>
         <Route path='*' element={<h1>ERROR</h1>}/>
         <Route path="/partido/editar/:id" element={<EditarPartido />} />
-
+        <Route path="/login" element={<LogIn/>}/>
       </Routes>
     </>
 
