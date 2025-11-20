@@ -10,7 +10,17 @@ export default function Banner() {
   const [mostrarLigas, setMostrarLigas] = useState(false)
   const navigate = useNavigate()
 
-  
+  useEffect(() => {
+    const cargar = async () => {
+      try {
+        const data = await obtenerLigas()
+        setLigas(data)
+      } catch (error) {
+        console.error('Error al cargar ligas:', error)
+      }
+    }
+    cargar()
+  }, [])
   return (
     <div className="w-full text-white py-3 px-6 mb-6 shadow-md flex items-center"
          style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}>
