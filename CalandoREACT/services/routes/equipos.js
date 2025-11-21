@@ -1,19 +1,37 @@
 import express from 'express';
 import { PrismaClient } from '../generated/prisma/index.js';
+import multer from 'multer';
+import path from 'path';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// Multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // carpeta de logos
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({ storage });
+
 // Crear equipo
-router.post('/', async (req, res) => {
-  const { nombre, entrenador, logo, ligaId } = req.body;
+router.post('/', upload.single('logo'), async (req, res) => {
+  const { nombre, entrenador, ligaId } = req.body;
+
+  const logo = req.file ? req.file.filename : null;
 
   try {
     const nuevo = await prisma.equipo.create({
       data: {
         nombre,
         entrenador,
-        logo: logo || null,
+        logo,
         liga: ligaId ? { connect: { id: Number(ligaId) } } : undefined
       }
     });
@@ -24,6 +42,7 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Error al crear equipo' });
   }
 });
+
 // Obtener equipos por liga
 router.get('/', async (req, res) => {
   const { ligaId } = req.query;
@@ -39,7 +58,8 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener equipos' });
   }
 });
-// Obtener por ID
+
+// Obtener equipo por ID
 router.get('/:id', async (req, res) => {
   const id = Number(req.params.id);
 
@@ -57,10 +77,11 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener equipo' });
   }
 });
-// Editar
-router.put('/:id', async (req, res) => {
+// Editar equipo (con opción de cambiar logo)
+router.put('/:id', upload.single('logo'), async (req, res) => {
   const id = Number(req.params.id);
-  const { nombre, entrenador, logo, ligaId } = req.body;
+  const { nombre, entrenador, ligaId } = req.body;
+  const logo = req.file ? req.file.filename : undefined; // si no se manda, NO cambia
 
   try {
     const actualizado = await prisma.equipo.update({
@@ -68,7 +89,7 @@ router.put('/:id', async (req, res) => {
       data: {
         nombre,
         entrenador,
-        logo,
+        ...(logo && { logo }),
         liga: ligaId ? { connect: { id: Number(ligaId) } } : undefined
       }
     });
@@ -79,6 +100,7 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al editar equipo' });
   }
 });
+
 // Eliminar
 router.delete('/:id', async (req, res) => {
   const id = Number(req.params.id);

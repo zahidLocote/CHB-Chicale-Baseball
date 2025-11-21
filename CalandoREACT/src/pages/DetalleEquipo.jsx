@@ -35,7 +35,8 @@ export default function DetalleEquipo() {
 
   if (!equipo) return <p className="text-center mt-8">Cargando equipo...</p>
 
-  const logo = equipo.logo ? `/uploads/${equipo.logo}` : placeholderfoto
+  const logo = equipo.logo ? `http://localhost:3001/uploads/${equipo.logo}` : placeholderfoto
+
 
   return (
     <>

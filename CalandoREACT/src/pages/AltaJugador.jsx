@@ -43,19 +43,34 @@ export default function AltaJugador({ equipoId, onClose }) {
       fechaNacimiento: form.fechaNacimiento,
       numero: parseInt(form.numero),
       posicion: form.posicion,
-      foto: null,
       equipoId: equipoId
     };
 
     try {
-      const result = await crearJugador(jugador);
+      // Crear FormData
+      const formData = new FormData();
+
+      Object.keys(jugador).forEach(key => {
+        formData.append(key, jugador[key]);
+      });
+
+      // Agregar la foto si existe
+      if (form.foto) {
+        formData.append("foto", form.foto);
+      }
+
+      // Enviar al backend
+      const result = await crearJugador(formData);
+
       alert(result.message);
       onClose();
+
     } catch (error) {
       console.error(error);
       alert(error.message || "Error al registrar jugador");
     }
   };
+
 
   return (
     <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">

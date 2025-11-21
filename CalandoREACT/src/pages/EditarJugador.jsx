@@ -88,21 +88,34 @@ export default function EditarJugador() {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validar()) return;
 
     try {
-      await editarJugador(id, {
-        ...jugador,
-        numero: parseInt(jugador.numero),
-        fechaNacimiento: new Date(jugador.fechaNacimiento)
+      const formData = new FormData();
+
+      // Agregar cada campo del jugador
+      Object.keys(jugador).forEach(key => {
+        if (key !== "foto") {
+          formData.append(key, jugador[key]);
+        }
       });
-      alert('Jugador actualizado correctamente');
+
+      // Si el usuario subió un archivo nuevo
+      if (jugador.foto instanceof File) {
+        formData.append("foto", jugador.foto);
+      }
+
+      await editarJugador(id, formData);
+
+      alert("Jugador actualizado correctamente");
       navigate(`/jugador/${id}`);
+
     } catch (error) {
-      console.error('Error al editar jugador:', error);
-      alert('No se pudo actualizar el jugador');
+      console.error(error);
+      alert("Error al actualizar jugador");
     }
   };
 

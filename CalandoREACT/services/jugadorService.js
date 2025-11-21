@@ -1,20 +1,22 @@
 const BASE_URL = 'http://localhost:3001/api/jugadores';
 
 // Crear jugador
-export async function crearJugador(jugador) {
-  const res = await fetch(BASE_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(jugador)
+export async function crearJugador(data) {
+  const res = await fetch(`${BASE_URL}`, {
+    method: "POST",
+    body: data
   });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Error al registrar jugador');
-  }
-
-  return await res.json();
+  return res.json();
 }
+
+export async function editarJugador(id, data) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "PUT",
+    body: data
+  });
+  return res.json();
+}
+
 // Obtener jugadores de un equipo
 export async function obtenerJugadoresPorEquipo(equipoId) {
   const res = await fetch(`${BASE_URL}/equipo/${equipoId}`);
@@ -34,21 +36,6 @@ export async function eliminarJugador(id) {
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.message || 'Error al eliminar jugador');
-  }
-
-  return await res.json();
-}
-// Editar jugador
-export async function editarJugador(id, datosActualizados) {
-  const res = await fetch(`${BASE_URL}/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(datosActualizados)
-  });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Error al editar jugador');
   }
 
   return await res.json();

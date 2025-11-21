@@ -1,26 +1,17 @@
 const BASE_URL = 'http://localhost:3001/api/equipos';
 
 // Crear equipo
-export async function crearEquipo({ nombre, entrenador, logo, ligaId }) {
-  const equipo = {
-    nombre,
-    entrenador,
-    logo: logo ? logo.name : null,
-    ligaId: Number(ligaId)
-  };
-
+export async function crearEquipo(data) {
   const res = await fetch(BASE_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(equipo)
-  });
+    method: "POST",
+    body: data
+  })
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Error al crear equipo');
+    throw new Error("Error al crear equipo")
   }
 
-  return res.json();
+  return res.json()
 }
 // Obtener equipo por ID
 export async function obtenerEquipoPorId(id) {
@@ -44,20 +35,20 @@ export async function eliminarEquipo(id) {
   return res.json();
 }
 // Editar equipo
-export async function editarEquipo(id, datosActualizados) {
+export async function editarEquipo(id, data) {
   const res = await fetch(`${BASE_URL}/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(datosActualizados)
-  });
+    method: "PUT",
+    body: data   // SIN headers, SIN JSON.stringify
+  })
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Error al editar equipo');
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error al editar equipo')
   }
 
-  return res.json();
+  return res.json()
 }
+
 // Obtener equipos por liga
 export async function obtenerEquiposPorLiga(ligaId) {
   const res = await fetch(`${BASE_URL}?ligaId=${ligaId}`);

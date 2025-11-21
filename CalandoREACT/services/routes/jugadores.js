@@ -1,34 +1,49 @@
 import express from 'express';
 import { PrismaClient } from '../generated/prisma/index.js';
+import multer from 'multer';
+import path from 'path';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Crear
-router.post('/', async (req, res) => {
-  const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, numero, posicion, foto, equipoId } = req.body;
 
-  if (!nombre || !apellidoPaterno || !fechaNacimiento || !numero || !posicion || !equipoId) {
-    return res.status(400).json({ message: 'Todos los campos obligatorios deben estar llenos' });
+// Multer config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, unique + ext);
   }
+});
+
+const upload = multer({ storage });
+
+// Crear
+router.post('/', upload.single('foto'), async (req, res) => {
+  const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, numero, posicion, equipoId } = req.body;
+
+  const foto = req.file ? req.file.filename : null;
 
   try {
-    const nuevo = await prisma.jugador.create({
+    const jugador = await prisma.jugador.create({
       data: {
         nombre,
         apellidoPaterno,
-        apellidoMaterno: apellidoMaterno || 'N/A',
+        apellidoMaterno,
         fechaNacimiento: new Date(fechaNacimiento),
         numero: Number(numero),
         posicion,
-        foto: foto || null,
-        equipo: { connect: { id: Number(equipoId) } }
+        equipoId: Number(equipoId),
+        foto
       }
     });
-    res.json(nuevo);
+    res.json({ message: "Jugador creado", jugador });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al registrar jugador' });
+    res.status(500).json({ error: "Error al crear jugador" });
   }
 });
 // Obtener por ID
@@ -51,23 +66,30 @@ router.get('/equipo/:equipoId', async (req, res) => {
   res.json(jugadores);
 });
 // Editar
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.single('foto'), async (req, res) => {
   const id = Number(req.params.id);
-  const datos = req.body;
+  const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, numero, posicion } = req.body;
+
+  const foto = req.file ? req.file.filename : undefined; 
 
   try {
-    const actualizado = await prisma.jugador.update({
+    const jugador = await prisma.jugador.update({
       where: { id },
       data: {
-        ...datos,
-        fechaNacimiento: new Date(datos.fechaNacimiento),
-        numero: Number(datos.numero)
+        nombre,
+        apellidoPaterno,
+        apellidoMaterno,
+        fechaNacimiento: new Date(fechaNacimiento),
+        numero: Number(numero),
+        posicion,
+        ...(foto && { foto })
       }
     });
-    res.json(actualizado);
+
+    res.json({ message: "Jugador editado", jugador });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al editar jugador' });
+    res.status(500).json({ error: "Error al editar jugador" });
   }
 });
 // Eliminar

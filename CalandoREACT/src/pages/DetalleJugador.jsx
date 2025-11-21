@@ -29,17 +29,19 @@ export default function DetalleJugador() {
 
         const dataHistorial = await obtenerHistorialJugador(id);
         setHistorial(dataHistorial);
+
+        // Cargar liga y equipos relacionados
         if (dataJugador?.equipoId) {
-        const equipoData = await obtenerEquipoPorId(dataJugador.equipoId);
+          const equipoData = await obtenerEquipoPorId(dataJugador.equipoId);
 
-        if (equipoData?.ligaId) {
-          const ligaData = await oxxbtenerLigaPorId(equipoData.ligaId);
-          setLiga(ligaData);
+          if (equipoData?.ligaId) {
+            const ligaData = await obtenerLigaPorId(equipoData.ligaId);
+            setLiga(ligaData);
 
-          const equiposData = await obtenerEquiposPorLiga(equipoData.ligaId);
-          setEquiposLiga(equiposData);
+            const equiposData = await obtenerEquiposPorLiga(equipoData.ligaId);
+            setEquiposLiga(equiposData);
+          }
         }
-      }
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
@@ -51,7 +53,10 @@ export default function DetalleJugador() {
   if (!jugador)
     return <p className="text-center mt-8">Cargando jugador...</p>;
 
-  const foto = jugador.foto ? `/uploads/${jugador.foto}` : placeholderfoto;
+  // 🔥 RUTA CORRECTA para fotos desde backend
+  const foto = jugador.foto
+    ? `http://localhost:3001/uploads/${jugador.foto}`
+    : placeholderfoto;
 
   function abrirModal(stat) {
     setStatSeleccionada(stat);
@@ -108,10 +113,11 @@ export default function DetalleJugador() {
 
   return (
     <>
-    <BannerLiga liga={liga} equipos={equiposLiga} />
+      <BannerLiga liga={liga} equipos={equiposLiga} />
+
       <div className="max-w-xl mx-auto mt-10 bg-white ">
         <h1 className="text-3xl font-bold mb-6 font-race text-center">
-          Detalle  del  Jugador
+          Detalle del Jugador
         </h1>
 
         {/* INFORMACIÓN PERSONAL */}
@@ -122,29 +128,14 @@ export default function DetalleJugador() {
             className="w-32 h-32 object-cover rounded-full shadow mb-4"
           />
 
-          <p>
-            <strong>Nombre:</strong> {jugador.nombre}
+          <p><strong>Nombre:</strong> {jugador.nombre}</p>
+          <p><strong>Apellido Paterno:</strong> {jugador.apellidoPaterno}</p>
+          <p><strong>Apellido Materno:</strong> {jugador.apellidoMaterno}</p>
+          <p><strong>Fecha de Nacimiento:</strong>{" "}
+            {new Date(jugador.fechaNacimiento).toLocaleDateString("es-MX")}
           </p>
-          <p>
-            <strong>Apellido Paterno:</strong>{" "}
-            {jugador.apellidoPaterno}
-          </p>
-          <p>
-            <strong>Apellido Materno:</strong>{" "}
-            {jugador.apellidoMaterno}
-          </p>
-          <p>
-            <strong>Fecha de Nacimiento:</strong>{" "}
-            {new Date(
-              jugador.fechaNacimiento
-            ).toLocaleDateString("es-MX")}
-          </p>
-          <p>
-            <strong>Número:</strong> {jugador.numero}
-          </p>
-          <p>
-            <strong>Posición:</strong> {jugador.posicion}
-          </p>
+          <p><strong>Número:</strong> {jugador.numero}</p>
+          <p><strong>Posición:</strong> {jugador.posicion}</p>
         </div>
 
         {/* BOTONES */}
@@ -168,9 +159,7 @@ export default function DetalleJugador() {
           <button
             className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
             onClick={async () => {
-              const confirmar = window.confirm(
-                "¿Seguro que deseas eliminar este jugador?"
-              );
+              const confirmar = window.confirm("¿Seguro que deseas eliminar este jugador?");
               if (!confirmar) return;
 
               await eliminarJugador(id);
@@ -181,7 +170,7 @@ export default function DetalleJugador() {
           </button>
         </div>
 
-        {/* HISTORIAL POR PARTIDO */}
+        {/* HISTORIAL */}
         <h2 className="text-2xl font-bold text-center mt-10 font-race">
           Historial por Partido
         </h2>
@@ -208,13 +197,10 @@ export default function DetalleJugador() {
               historial.map((stat) => (
                 <tr key={stat.id} className="border">
                   <td className="p-2 font-semibold">
-                    {stat.partido.equipoNombre1} vs{" "}
-                    {stat.partido.equipoNombre2}
+                    {stat.partido.equipoNombre1} vs {stat.partido.equipoNombre2}
                   </td>
                   <td className="p-2">
-                    {new Date(
-                      stat.partido.fecha
-                    ).toLocaleDateString()}
+                    {new Date(stat.partido.fecha).toLocaleDateString()}
                   </td>
                   <td className="p-2">{stat.H}</td>
                   <td className="p-2">{stat.HR}</td>
@@ -237,10 +223,7 @@ export default function DetalleJugador() {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="11"
-                  className="py-4 text-gray-500"
-                >
+                <td colSpan="11" className="py-4 text-gray-500">
                   No hay historial...
                 </td>
               </tr>
