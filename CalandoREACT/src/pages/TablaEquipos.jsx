@@ -6,6 +6,8 @@ import { eliminarEquipo, obtenerEquiposPorLiga, obtenerEstadisticasPorLiga } fro
 import { obtenerLigaPorId } from '../../services/ligaService'
 import { obtenerPartidosPorLiga } from '../../services/partidoService'
 import { useParams, useLocation } from 'react-router-dom'
+import BannerLiga from '../components/UI/BannerLiga'
+import SlideshowLiga from '../components/UI/SlideShowLiga'
 
 export default function TablaEquipos() {
   const [equipos, setEquipos] = useState([])
@@ -60,6 +62,8 @@ export default function TablaEquipos() {
 
   return (
     <>
+    <BannerLiga liga={liga} equipos={equipos} />
+      <SlideshowLiga liga={liga} equipos={equipos} />
       <button 
         onClick={() => navigate(-1)} 
         className="text-xl text-blue-500 underline hover:text-blue-800 ml-50"
