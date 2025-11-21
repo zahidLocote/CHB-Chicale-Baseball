@@ -30,34 +30,35 @@ export default function EditarLiga() {
     const [logoLiga, setLogoLiga] = useState(null);
 
     useEffect(() => {
-  const cargarLiga = async () => {
-    try {
-      const liga = await obtenerLigaPorId(id);
-      
-      setNombreLiga(liga.nombreLiga);
-      setEdadMin(liga.edad_min);
-      setEdadMax(liga.edad_max);
-      setCategoria(liga.categoria);
-      setNombrePresidente(liga.nombrePresidente);
-      setContactoPresidente(liga.contactoPresidente);
-      setImagePreview(liga.logoUrl || null); // si tienes logo
-      
-    } catch (error) {
-      console.error('Error al cargar la liga:', error);
-      // Mostrar error con popup
-                
-      setPopupConfig({
-        title: 'Error',            
-        message: 'No se pudo cargar la información de la liga',
-        type: 'error'
-                
-    });
-    setShowPopup(true);
-    }
-  };
+        const cargarLiga = async () => {
+            try {
+                const liga = await obtenerLigaPorId(id);
 
-  if (id) cargarLiga();
-}, [id]);
+                setNombreLiga(liga.nombreLiga);
+                setEdadMin(liga.edad_min);
+                setEdadMax(liga.edad_max);
+                setCategoria(liga.categoria);
+                setNombrePresidente(liga.nombrePresidente);
+                setContactoPresidente(liga.contactoPresidente);
+                setImagePreview(`http://localhost:3001/uploads/${liga.logo}`);
+
+
+            } catch (error) {
+                console.error('Error al cargar la liga:', error);
+                // Mostrar error con popup
+
+                setPopupConfig({
+                    title: 'Error',
+                    message: 'No se pudo cargar la información de la liga',
+                    type: 'error'
+
+                });
+                setShowPopup(true);
+            }
+        };
+
+        if (id) cargarLiga();
+    }, [id]);
 
 
 
@@ -80,26 +81,26 @@ export default function EditarLiga() {
         const numValue = parseInt(value) || 1;
         if (type === 'min') setEdadMin(Math.max(1, Math.min(100, numValue)));
         else setEdadMax(Math.max(1, Math.min(100, numValue)));
-         limpiarError('rangoEdad');
+        limpiarError('rangoEdad');
     };
 
     // Cambiar valores de texto
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         switch (name) {
-            case 'nombreLiga': setNombreLiga(value); 
-            limpiarError('nombreLiga');
-            break;
-            case 'categoria': setCategoria(value); 
-            limpiarError('categoria');
-            break;
+            case 'nombreLiga': setNombreLiga(value);
+                limpiarError('nombreLiga');
+                break;
+            case 'categoria': setCategoria(value);
+                limpiarError('categoria');
+                break;
             case 'nombrePresidente': setNombrePresidente(value);
-            limpiarError('nombrePresidente');
-            break;
-            case 'contactoPresidente': 
-            setContactoPresidente(value);
-            limpiarError('contactoPresidente');
-            break;
+                limpiarError('nombrePresidente');
+                break;
+            case 'contactoPresidente':
+                setContactoPresidente(value);
+                limpiarError('contactoPresidente');
+                break;
             default: break;
         }
     };
@@ -124,61 +125,75 @@ export default function EditarLiga() {
     const handleClosePopup = () => {
         setShowPopup(false);
         limpiarErrores();
-        
+
         // Si fue éxito, regresar a la página principal
         if (popupConfig.type === 'success') {
             navigate('/');
         }
     };
 
-    const handleSubmit = async (e) =>{
-        e.preventDefault()
+const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        const esValido = validarFormularioLiga({
-            nombreLiga,
-            edadMin,
-            edadMax,
-            categoria,
-            nombrePresidente,
-            contactoPresidente
+    const esValido = validarFormularioLiga({
+        nombreLiga,
+        edadMin,
+        edadMax,
+        categoria,
+        nombrePresidente,
+        contactoPresidente
+    });
+
+    if (!esValido) {
+        setPopupConfig({
+            title: 'Campos Obligatorios',
+            message: null,
+            type: 'error'
         });
-
-        if (!esValido) {
-            // Mostrar errores en popup
-            setPopupConfig({
-                title: 'Campos Obligatorios',
-                message: null,  // Se generará desde errors
-                type: 'error'
-            });
-            setShowPopup(true);
-            return;
-        }
-
-         console.log('Formulario válido, enviando...');
-        try {
-            // Aquí harías la actualización a la API
-            await editarLigas(id, {nombreLiga, edadMin, edadMax, categoria, nombrePresidente, contactoPresidente})
-            setPopupConfig({
-                title: '¡Éxito!',
-                message: 'La liga se ha actualizado correctamente',
-                type: 'success'
-            });
-            setShowPopup(true);
-        } catch (error) {
-            console.error('Error al actualizar:', error);
-            setPopupConfig({
-                title: 'Error',
-                message: 'No se pudo actualizar la liga. Intenta nuevamente.',
-                type: 'error'
-            });
-            setShowPopup(true);
-        }
-
+        setShowPopup(true);
+        return;
     }
+
+    try {
+    
+        const formToSend = new FormData();
+        formToSend.append("nombreLiga", nombreLiga);
+        formToSend.append("edadMin", edadMin);
+        formToSend.append("edadMax", edadMax);
+        formToSend.append("categoria", categoria);
+        formToSend.append("nombrePresidente", nombrePresidente);
+        formToSend.append("contactoPresidente", contactoPresidente);
+
+        // Solo se envía si el usuario cambió la imagen
+        if (logoLiga) {
+            formToSend.append("logo", logoLiga); // ← nombre esperado por Multer
+        }
+
+        await editarLigas(id, formToSend);  // ← Ahora sí envía FormData
+
+        setPopupConfig({
+            title: '¡Éxito!',
+            message: 'La liga se ha actualizado correctamente',
+            type: 'success'
+        });
+        setShowPopup(true);
+
+    } catch (error) {
+        console.error('❌ Error al actualizar:', error);
+
+        setPopupConfig({
+            title: 'Error',
+            message: 'No se pudo actualizar la liga. Intenta nuevamente.',
+            type: 'error'
+        });
+        setShowPopup(true);
+    }
+};
+
 
     return (
         <>
-        {/* Popup de alerta */}
+            {/* Popup de alerta */}
             <AlertaPopUp
                 show={showPopup}
                 onClose={handleClosePopup}
@@ -187,7 +202,7 @@ export default function EditarLiga() {
                 type={popupConfig.type}
                 errors={errors}
             />
-        
+
             <h1 className="text-center text-3xl mb-6 mt-10">Editar Liga</h1>
             <div className="flex justify-center items-center px-4">
                 <div className="w-full max-w-md border border-gray-400 rounded-lg p-7 bg-white shadow-xl">

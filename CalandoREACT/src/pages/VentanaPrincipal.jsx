@@ -1,12 +1,12 @@
-import { useEffect,useState } from "react";
-import  InfoCard  from '../components/UI/InfoCard'
+import { useEffect, useState } from "react";
+import InfoCard from '../components/UI/InfoCard'
 import { obtenerLigas } from '../../services/ligaService'
 import { useNavigate } from 'react-router-dom';
 import EliminarPopUp from "../components/UI/eliminarPopUp";
 import { eliminarLiga } from "../../services/ligaService";
 
 
-export default function VentanaPrincipal(){
+export default function VentanaPrincipal() {
     const [ligas, setLigas] = useState([])
     const navigate = useNavigate();
     const [ligaEliminar, setLigaEliminar] = useState(null)
@@ -15,9 +15,9 @@ export default function VentanaPrincipal(){
         try {
             const data = await obtenerLigas();
             setLigas(data);
-            } catch (error) {
-                console.error('Error al cargar ligas:', error);
-            }
+        } catch (error) {
+            console.error('Error al cargar ligas:', error);
+        }
     };
 
     useEffect(() => {
@@ -31,7 +31,7 @@ export default function VentanaPrincipal(){
 
     const handleVerEquipos = (liga) => {
         navigate(`/ligas/${liga.id}/equipos`, { state: { liga } });
-    }   
+    }
 
     const handleEliminar = (liga) => {
         console.log('Eliminar liga:', liga)
@@ -47,13 +47,13 @@ export default function VentanaPrincipal(){
             await eliminarLiga(ligaEliminar.id)
             console.log('Eliminando liga:', ligaEliminar.nombreLiga)
             setLigaEliminar(null); // Cierra el popup
-            await cargarLigas(); 
+            await cargarLigas();
         } catch (error) {
             console.error('Error:', error)
         }
     }
-    
-    return(
+
+    return (
         <>
             <h1 className="text-center font-bold text-3xl mb-6">Consulta de Ligas</h1>
 
@@ -63,28 +63,29 @@ export default function VentanaPrincipal(){
                     const dataAdapt = {
                         id: liga.id,
                         nombre: liga.nombreLiga,
-                        logo: liga.logoUrl
+                        logo: liga.logo
                     }
+
 
                     return (
                         <div key={liga.id} onClick={() => handleVerEquipos(liga)} className="cursor-pointer" >
-              
+
                             <InfoCard
-                            data={dataAdapt}
-                            tipo="liga"
-                            onVer={() => handleVer(liga)}
-                            onEliminar={() => handleEliminar(liga)}
-                             />
+                                data={dataAdapt}
+                                tipo="liga"
+                                onVer={() => handleVer(liga)}
+                                onEliminar={() => handleEliminar(liga)}
+                            />
                         </div>
 
                     )
                 })}
             </div>
-             <EliminarPopUp
-                    liga={ligaEliminar}
-                    onConfirmar={confirmarEliminacion}
-                    onCancelar={cancelarEliminacion}
-                />
+            <EliminarPopUp
+                liga={ligaEliminar}
+                onConfirmar={confirmarEliminacion}
+                onCancelar={cancelarEliminacion}
+            />
             <div className="flex justify-center mt-6">
                 <button onClick={() => navigate('ligas/nuevo')} className="bg-green-200 text-green-800 font-semibold px-4 py-2 rounded hover:bg-green-300 cursor-pointer">
                     Agregar Liga

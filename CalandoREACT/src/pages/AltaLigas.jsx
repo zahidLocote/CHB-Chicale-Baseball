@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { AlertaPopUp } from '../components/UI/AlertaPopUp';
 import { ImageUpload } from '../components/UI/ImageUpload';
 import { registrarLiga } from '../../services/ligaService';
-import { ligaFormValidation } from '../hooks/ligaFormValidation'; 
+import { ligaFormValidation } from '../hooks/ligaFormValidation';
 import { useNavigate } from 'react-router-dom';
 
 export default function AltaJugador() {
   const { errors, validarFormularioLiga, limpiarError, limpiarErrores } = ligaFormValidation();
   const navigate = useNavigate();
 
-  
+
   const [formData, setFormData] = useState({
     nombreLiga: '',
     edadMin: 0,
@@ -19,8 +19,8 @@ export default function AltaJugador() {
     contactoPresidente: '',
     logoLiga: null
   });
-  
-  const [showPopup, setShowPopup] = useState(false); 
+
+  const [showPopup, setShowPopup] = useState(false);
   const [popupConfig, setPopupConfig] = useState({
     title: '',
     message: '',
@@ -106,69 +106,71 @@ export default function AltaJugador() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // ← Usar validación del hook
+
+    // Validación normal
     const esValido = validarFormularioLiga({
       nombreLiga: formData.nombreLiga,
       edadMin: formData.edadMin,
       edadMax: formData.edadMax,
       categoria: formData.categoria,
       nombrePresidente: formData.nombrePresidente,
-      contactoPresidente: formData.contactoPresidente
+      contactoPresidente: formData.contactoPresidente,
     });
 
-    if (esValido) {
-      try {
-        const ligaInformacion = {
-          nombreLiga: formData.nombreLiga.trim(),
-          edadMin: formData.edadMin,
-          edadMax: formData.edadMax,
-          categoria: formData.categoria.trim(),
-          nombrePresidente: formData.nombrePresidente.trim(),
-          contactoPresidente: formData.contactoPresidente.trim()
-        };
-        
-        await registrarLiga(ligaInformacion);
-        
-        // Mostrar popup de éxito
-        setPopupConfig({
-          title: '¡Éxito!',
-          message: 'El registro de la liga se ha completado exitosamente.',
-          type: 'success'
-        });
-        setShowPopup(true);
-        
-        
-        // Resetear formulario
-        setFormData({
-          nombreLiga: '',
-          edadMin: 0,
-          edadMax: 0,
-          categoria: '',
-          nombrePresidente: '',
-          contactoPresidente: '',
-          logoLiga: null
-        });
-        setImagePreview(null);
-      } catch (error) {
-        console.error('Error al registrar:', error);
-        setPopupConfig({
-          title: 'Error',
-          message: 'No se pudo registrar la liga. Intenta nuevamente.',
-          type: 'error'
-        });
-        setShowPopup(true);
-      }
-    } else {
-      // Mostrar popup de error con validaciones
+    if (!esValido) {
       setPopupConfig({
-        title: 'Campos Obligatorios',
-        message: null,  // Se usarán los errors del hook
-        type: 'error'
+        title: "Campos Obligatorios",
+        message: null,
+        type: "error",
+      });
+      setShowPopup(true);
+      return;
+    }
+
+    try {
+      // FORM DATA
+      const formToSend = new FormData();
+      formToSend.append("nombreLiga", formData.nombreLiga.trim());
+      formToSend.append("edadMin", formData.edadMin);
+      formToSend.append("edadMax", formData.edadMax);
+      formToSend.append("categoria", formData.categoria.trim());
+      formToSend.append("nombrePresidente", formData.nombrePresidente.trim());
+      formToSend.append("contactoPresidente", formData.contactoPresidente.trim());
+
+      if (formData.logoLiga) {
+        formToSend.append("logo", formData.logoLiga); // nombre que usa Multer
+      }
+
+      await registrarLiga(formToSend);
+
+      setPopupConfig({
+        title: "¡Éxito!",
+        message: "El registro de la liga se ha completado exitosamente.",
+        type: "success",
+      });
+      setShowPopup(true);
+
+      // Resetear
+      setFormData({
+        nombreLiga: "",
+        edadMin: 0,
+        edadMax: 0,
+        categoria: "",
+        nombrePresidente: "",
+        contactoPresidente: "",
+        logoLiga: null,
+      });
+      setImagePreview(null);
+    } catch (error) {
+      setPopupConfig({
+        title: "Error",
+        message: "No se pudo registrar la liga. Intenta nuevamente.",
+        type: "error",
       });
       setShowPopup(true);
     }
   };
+
 
   const handleClosePopup = () => {
     setShowPopup(false);
@@ -190,12 +192,12 @@ export default function AltaJugador() {
       />
 
       <div className="flex flex-col items-center min-h-screen bg-gray-50">
-        
+
         <h1 className="mt-10 text-3xl font-bold text-center">Registro de Liga</h1>
 
         <div className="mt-2 w-full max-w-md border border-gray-300 rounded-lg p-7 bg-white shadow">
           <form className="space-y-3" onSubmit={handleSubmit}>
-            
+
             {/* Nombre de liga */}
             <div>
               <input
@@ -277,7 +279,7 @@ export default function AltaJugador() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Mensajes de error para el rango de edad */}
               {errors.rangoEdad && <p className="text-red-500 text-sm mt-1">{errors.rangoEdad}</p>}
             </div>
@@ -335,7 +337,7 @@ export default function AltaJugador() {
               placeholder="Click para subir tu logo"
               helpText="PNG y JPG"
               size="w-full"
-            />     
+            />
 
             {/* Contenedor de botones */}
             <div className="flex justify-between">

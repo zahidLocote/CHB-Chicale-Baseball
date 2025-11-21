@@ -9,6 +9,9 @@ import equiposRouter from "./routes/equipos.js";
 import ligasRouter from "./routes/ligas.js";
 import partidosRouter from "./routes/partidos.js";
 import estadisticasRouter from './routes/estadisticas.js';
+import multer from "multer";
+import path from "path";
+
 
 dotenv.config();
 const app = express();
@@ -56,6 +59,10 @@ cron.schedule('* * * * *', async () => {
     isRunning = false;
   }
 }, { timezone: ZONA });
+
+
+// Hacer carpeta uploads pública
+app.use("/uploads", express.static("uploads"));
 
 // Rutas
 app.use("/api/jugadores", jugadoresRouter);

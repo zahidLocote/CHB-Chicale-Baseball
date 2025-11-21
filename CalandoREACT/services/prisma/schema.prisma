@@ -17,7 +17,7 @@ model presidente{
   contacto String
 }
 
-model Liga{
+model Liga {
   id Int @id @default(autoincrement())
   nombreLiga String
   edad_min Int
@@ -25,8 +25,9 @@ model Liga{
   categoria String
   nombrePresidente String
   contactoPresidente String
-  equipo               equipo[]
-  partido              Partido[]
+  logo String?   
+  equipo   equipo[]
+  partido  Partido[]
 }
 
 model equipo{
