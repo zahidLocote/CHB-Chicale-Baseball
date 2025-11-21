@@ -4,6 +4,10 @@ import placeholderfoto from "../assets/placeholderfoto.jpg";
 import ModalEditarEstadisticas from "../components/modals/ModalEditarEstadisticas";
 import { obtenerJugadorPorId, eliminarJugador } from "../../services/jugadorService";
 import { obtenerHistorialJugador, editarEstadisticaPartido } from "../../services/estadisticaService";
+import BannerLiga from "../components/UI/BannerLiga";
+import { obtenerLigaPorId } from "../../services/ligaService";
+import { obtenerEquiposPorLiga } from "../../services/equipoService";
+import { obtenerEquipoPorId } from "../../services/equipoService";
 
 export default function DetalleJugador() {
   const { id } = useParams();
@@ -13,6 +17,8 @@ export default function DetalleJugador() {
   const [historial, setHistorial] = useState([]);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [statSeleccionada, setStatSeleccionada] = useState(null);
+  const [liga, setLiga] = useState(null);
+  const [equiposLiga, setEquiposLiga] = useState([]);
 
   // Cargar datos del jugador + historial de partidos
   useEffect(() => {
@@ -23,6 +29,17 @@ export default function DetalleJugador() {
 
         const dataHistorial = await obtenerHistorialJugador(id);
         setHistorial(dataHistorial);
+        if (dataJugador?.equipoId) {
+        const equipoData = await obtenerEquipoPorId(dataJugador.equipoId);
+
+        if (equipoData?.ligaId) {
+          const ligaData = await oxxbtenerLigaPorId(equipoData.ligaId);
+          setLiga(ligaData);
+
+          const equiposData = await obtenerEquiposPorLiga(equipoData.ligaId);
+          setEquiposLiga(equiposData);
+        }
+      }
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
@@ -91,9 +108,10 @@ export default function DetalleJugador() {
 
   return (
     <>
-      <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded shadow">
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          Detalle del Jugador
+    <BannerLiga liga={liga} equipos={equiposLiga} />
+      <div className="max-w-xl mx-auto mt-10 bg-white ">
+        <h1 className="text-3xl font-bold mb-6 font-race text-center">
+          Detalle  del  Jugador
         </h1>
 
         {/* INFORMACIÓN PERSONAL */}
@@ -164,7 +182,7 @@ export default function DetalleJugador() {
         </div>
 
         {/* HISTORIAL POR PARTIDO */}
-        <h2 className="text-2xl font-bold text-center mt-10">
+        <h2 className="text-2xl font-bold text-center mt-10 font-race">
           Historial por Partido
         </h2>
 
@@ -231,7 +249,7 @@ export default function DetalleJugador() {
         </table>
 
         {/* --- RESUMEN DE TEMPORADA --- */}
-        <h2 className="text-2xl font-bold text-center mt-10">
+        <h2 className="text-2xl font-bold text-center mt-10 font-race">
           Resumen de Temporada
         </h2>
 
@@ -263,11 +281,11 @@ export default function DetalleJugador() {
         </table>
 
         {/* ESTADÍSTICAS AVANZADAS */}
-        <h3 className="text-xl font-bold text-center mt-6">
+        <h3 className="text-xl font-bold text-center mt-6 font-race">
           Estadísticas Avanzadas
         </h3>
 
-        <div className="grid grid-cols-2 gap-4 mt-4 text-center">
+        <div className="grid grid-cols-2 gap-4 mt-4 text-center mb-12">
           <div className="bg-white p-4 rounded-lg shadow">
             <p className="font-bold text-gray-700">AVG</p>
             <p className="text-xl">{resumen.AVG}</p>

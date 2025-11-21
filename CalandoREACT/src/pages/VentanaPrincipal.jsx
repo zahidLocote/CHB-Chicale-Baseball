@@ -90,10 +90,11 @@ export default function VentanaPrincipal(){
                     onCancelar={cancelarEliminacion}
                 />
             <div className="flex justify-center mt-6">
-                <button onClick={() => navigate('ligas/nuevo')} className="bg-green-200 text-green-800 font-semibold px-4 py-2 rounded hover:bg-green-300 cursor-pointer">
+                <button onClick={() => navigate('ligas/nuevo')} className="bg-green-200 text-green-800 font-semibold px-4 py-2 rounded hover:bg-green-300 cursor-pointer mb-12">
                     Agregar Liga
                 </button>
             </div>
+            
         </>
     )
 }

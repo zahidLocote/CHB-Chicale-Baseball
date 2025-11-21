@@ -64,14 +64,8 @@ export default function TablaEquipos() {
     <>
     <BannerLiga liga={liga} equipos={equipos} />
       <SlideshowLiga liga={liga} equipos={equipos} />
-      <button 
-        onClick={() => navigate(-1)} 
-        className="text-xl text-blue-500 underline hover:text-blue-800 ml-50"
-      >
-        ← Volver
-      </button>
 
-      <h1 className='text-center text-3xl font-bold'>
+      <h1 className='text-center text-3xl font-race mt-12'>
         Equipos en la liga {liga?.nombreLiga}
       </h1>
 
@@ -93,20 +87,24 @@ export default function TablaEquipos() {
       <div className="flex justify-center mt-6 gap-x-5">
         <button
           onClick={() => navigate('/nuevo', { state: { ligaId: liga?.id } })}
-          className="bg-green-200 text-green-800 font-bold px-4 py-2 rounded hover:bg-green-300 cursor-pointer"
+          className="bg-green-200 text-green-800 font-bold px-4 py-2 rounded hover:bg-green-300 cursor-pointer mb-6"
         >
           Agregar Equipo
         </button>
         <button
           onClick={() => navigate('/partidoNuevo', { state: { liga } })}
-          className="bg-gray-300 text-gray-600 font-bold px-4 py-2 rounded hover:bg-gray-200 cursor-pointer"
+          className="bg-gray-300 text-gray-600 font-bold px-4 py-2 rounded hover:bg-gray-200 cursor-pointer mb-6"
         >
           Registrar partido
         </button>
       </div>
+      <div
+  className="w-full h-[80px] mb-6 shadow-md"
+  style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
+></div>
 
       {/* Estadísticas */}
-      <h1 className='text-center text-3xl font-bold mt-10 mb-6'>- Estadísticas por equipo -</h1>
+      <h1 className='text-center text-3xl font-bold mt-10 mb-6 font-race'>- Estadísticas por equipo -</h1>
       <div className="overflow-x-auto mb-10">
         <table className="min-w-full border border-gray-300 text-sm text-center bg-white shadow-md">
           <thead className="bg-gray-100 font-bold">
@@ -139,13 +137,17 @@ export default function TablaEquipos() {
           </tbody>
         </table>
       </div>
+      <div
+  className="w-full h-[80px] mb-6 shadow-md"
+  style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
+></div>
 
       {/* Partidos */}
-      <h1 className='text-center text-3xl font-bold mb-10'>- Partidos -</h1>
+      <h1 className='text-center text-3xl font-bold mb-10 font-race'>- Partidos -</h1>
       <div>
         {partidos.length === 0 ? (
           <div className="mt-5 w-full border border-gray-400 rounded-4xl p-7 bg-white shadow-xl">
-            <p className="text-center text-gray-500">No hay partidos registrados aún.</p>
+            <p className="text-center text-gray-500 font-race ">No hay partidos registrados aún.</p>
           </div>
         ) : (
           <div className="w-300 mx-auto mb-10 space-y-10">

@@ -67,7 +67,7 @@ export default function Slideshow() {
       {/* Flechas de desplazamiento */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 text-white text-xl bg-black/30  px-2 py-20 hover:bg-black/50"
+        className="absolute left-4 text-white text-5xl bg-black/30  px-2 py-20 hover:bg-black/50"
       >
         ‹
       </button>

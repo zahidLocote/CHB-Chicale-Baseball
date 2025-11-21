@@ -20,7 +20,7 @@ export default function BannerLiga({ liga, equipos }) {
       />
 
       {/* Botones centrales */}
-      <div className="flex ml-40 gap-x-10 text-2xl font-race">
+      <div className="flex ml-40 gap-x-10 w-47 text-2xl font-race">
         {/* Home */}
         <button
           onClick={() => navigate('/')}
@@ -33,7 +33,7 @@ export default function BannerLiga({ liga, equipos }) {
         <div className="relative">
           <button
             onClick={() => setMostrarEquipos(!mostrarEquipos)}
-            className="hover:bg-black/20 px-4 py-2 rounded border-l-2 border-r-2 border-black/20"
+            className="hover:bg-black/20 px-4 py-2 w- rounded border-l-2 border-r-2 border-black/20"
           >
             Equipos <span className="text-lg">▼</span>
           </button>
