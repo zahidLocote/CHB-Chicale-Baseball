@@ -1,1 +1,15 @@
-@import 'tailwindcss'
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'RaceSport';
+  src: url('./assets/fonts/Race Sport.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.btn-race {
+  font-family: 'RaceSport', sans-serif;
+}
+.font-race {
+  font-family: 'RaceSport', sans-serif;
+}

@@ -1,71 +1,41 @@
 import React, { useState, useEffect } from 'react'
-import chicalisLogo from '../../assets/chicalis.png'   // logo sistema
-import { obtenerLigas } from '../../../services/ligaService'
 import { useNavigate } from 'react-router-dom'
 
-export default function Slideshow() {
-  const [slides, setSlides] = useState([])
+export default function SlideshowLiga({ liga, equipos }) {
   const [current, setCurrent] = useState(0)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const cargar = async () => {
-      try {
-        const ligas = await obtenerLigas()
-        const sistemaSlide = { type: 'system', logo: chicalisLogo }
-        const ligaSlides = ligas.map(liga => ({
-          type: 'liga',
-          logo: liga.logo
-            ? `http://localhost:3001/uploads/${liga.logo}`
-            : chicalisLogo,
-          nombre: liga.nombreLiga,
-          id: liga.id
-        }))
-
-
-        setSlides([sistemaSlide, ...ligaSlides])
-      } catch (error) {
-        console.error('Error al cargar slideshow:', error)
-      }
-    }
-    cargar()
-  }, [])
-
+  const slides = [
+    { type: 'liga', logo: liga?.logoUrl, nombre: liga?.nombreLiga },
+    ...equipos.map(e => ({ type: 'equipo', logo: e.logoUrl, nombre: e.nombreEquipo, id: e.id }))
+  ]
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent(prev => (prev + 1) % slides.length)
     }, 4000)
     return () => clearInterval(interval)
-  }, [slides])
+  }, [slides.length])
 
   if (slides.length === 0) return null
-
   const slide = slides[current]
 
-  const prevSlide = () => {
-    setCurrent(prev => (prev - 1 + slides.length) % slides.length)
-  }
-
-  const nextSlide = () => {
-    setCurrent(prev => (prev + 1) % slides.length)
-  }
+  const prevSlide = () => setCurrent(prev => (prev - 1 + slides.length) % slides.length)
+  const nextSlide = () => setCurrent(prev => (prev + 1) % slides.length)
 
   return (
     <div
       className="relative w-full h-[300px] flex items-center justify-center overflow-hidden shadow-lg"
       style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
     >
-      {slide.type === 'system' ? (
-        <img src={slide.logo} alt="Logo sistema" className="h-50 w-auto" />
+      {slide.type === 'liga' ? (
+        <img src={slide.logo} alt={`Logo ${slide.nombre}`} className="h-40 w-auto" />
       ) : (
         <img
           src={slide.logo}
           alt={`Logo ${slide.nombre}`}
           className="h-40 w-auto cursor-pointer"
-          onClick={() =>
-            navigate(`/ligas/${slide.id}/equipos`, { state: { liga: slide } })
-          }
+          onClick={() => navigate(`/equipos/${slide.id}`)}
         />
       )}
 
@@ -88,8 +58,7 @@ export default function Slideshow() {
         {slides.map((_, i) => (
           <span
             key={i}
-            className={`w-3 h-3 rounded-full ${i === current ? 'bg-white' : 'bg-black/30'
-              }`}
+            className={`w-3 h-3 rounded-full ${i === current ? 'bg-white' : 'bg-black/30'}`}
           ></span>
         ))}
       </div>

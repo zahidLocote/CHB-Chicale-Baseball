@@ -12,6 +12,9 @@ import TablaEquipos from './pages/TablaEquipos'
 import AltaPartido from './pages/AltaPartido'
 import EditarPartido from './pages/EditarPartido'; // o './components/UI/EditarPartido'
 
+import PartidosPage from './pages/PartidosPage'
+import EstadisticasPage from './pages/EstadisticasPage'
+
 function App() {
   return (
     <>
@@ -28,6 +31,9 @@ function App() {
         <Route path="/partidoNuevo" element={<AltaPartido/>}/>
         <Route path='*' element={<h1>ERROR</h1>}/>
         <Route path="/partido/editar/:id" element={<EditarPartido />} />
+        
+        <Route path="/ligas/:id/partidos" element={<PartidosPage />} />
+        <Route path="/ligas/:id/estadisticas" element={<EstadisticasPage />} />
 
       </Routes>
     </>
