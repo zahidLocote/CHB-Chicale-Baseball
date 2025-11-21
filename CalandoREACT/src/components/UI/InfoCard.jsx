@@ -3,7 +3,7 @@ import placeholderfoto from '../../assets/placeholderfoto.jpg'
 export default function InfoCard({ data, tipo, onVer, onEliminar }) {
   const nombre = data.nombre
   const id = data.id
-  const logo = data.logo ? `/uploads/${data.logo}` : placeholderfoto
+  const logo = data.logo ? `http://localhost:3001/uploads/${data.logo}` : placeholderfoto;
 
   return (
     <div className="mt-5 w-70 border border-gray-400 rounded-4xl p-7 bg-white shadow-xl">

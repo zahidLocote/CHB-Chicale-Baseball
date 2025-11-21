@@ -1,25 +1,16 @@
 const BASE_URL = 'http://localhost:3001/api/ligas';
 
 // Registrar liga
-export async function registrarLiga(data) {
-  try {
-    const response = await fetch(BASE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+export async function registrarLiga(formData) {
+  const res = await fetch(BASE_URL, {
+    method: "POST",
+    body: formData, 
+  });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Server responded with ${response.status}: ${errorText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error en registrarLiga:', error);
-    throw error;
-  }
+  if (!res.ok) throw new Error("Error al registrar liga");
+  return await res.json();
 }
+
 // Obtener listas de ligas
 export async function obtenerLigas() {
   const res = await fetch(BASE_URL);
@@ -29,18 +20,13 @@ export async function obtenerLigas() {
   return await res.json();
 }
 // Editar liga
-export async function editarLigas(id, datosActualizados) {
+export async function editarLigas(id, formData) {
   const res = await fetch(`${BASE_URL}/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(datosActualizados)
+    method: "PUT",
+    body: formData   //NO JSON, NO headers
   });
 
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Error al editar liga');
-  }
-
+  if (!res.ok) throw new Error("Error al editar liga");
   return await res.json();
 }
 // Obtener liga por ID
