@@ -9,6 +9,7 @@ import equiposRouter from "./routes/equipos.js";
 import ligasRouter from "./routes/ligas.js";
 import partidosRouter from "./routes/partidos.js";
 import estadisticasRouter from './routes/estadisticas.js';
+import adminRouter from "./routes/admin.js";
 
 dotenv.config();
 const app = express();
@@ -63,5 +64,6 @@ app.use("/api/equipos", equiposRouter);
 app.use("/api/ligas", ligasRouter);
 app.use("/api/partidos", partidosRouter);
 app.use("/api/estadisticas", estadisticasRouter);
+app.use("/api/admin", adminRouter);
 
 app.listen(3001, () => console.log('Servidor corriendo en puerto 3001'));

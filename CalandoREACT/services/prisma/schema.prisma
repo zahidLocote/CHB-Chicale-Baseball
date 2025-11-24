@@ -145,6 +145,6 @@ model EstadisticaJugadorTotal {
 
 model administrador{
   id             Int      @id @default(autoincrement())
-  usuario        String
+  usuario        String   @unique
   password       String
 }
