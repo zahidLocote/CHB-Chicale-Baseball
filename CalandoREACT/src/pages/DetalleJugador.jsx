@@ -4,6 +4,7 @@ import placeholderfoto from "../assets/placeholderfoto.jpg";
 import ModalEditarEstadisticas from "../components/modals/ModalEditarEstadisticas";
 import { obtenerJugadorPorId, eliminarJugador } from "../../services/jugadorService";
 import { obtenerHistorialJugador, editarEstadisticaPartido } from "../../services/estadisticaService";
+import { useAuth } from "../context/AuthContext";
 
 export default function DetalleJugador() {
   const { id } = useParams();
@@ -13,6 +14,8 @@ export default function DetalleJugador() {
   const [historial, setHistorial] = useState([]);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [statSeleccionada, setStatSeleccionada] = useState(null);
+  const { esAdmin } = useAuth(); // ← Obtener esAdmin
+
 
   // Cargar datos del jugador + historial de partidos
   useEffect(() => {
@@ -131,12 +134,31 @@ export default function DetalleJugador() {
 
         {/* BOTONES */}
         <div className="flex justify-center gap-4 mt-6">
-          <button
-            onClick={() => navigate(`/jugador/editar/${jugador.id}`)}
-            className="bg-yellow-500 text-white px-5 py-2 rounded hover:bg-yellow-600"
-          >
-            Editar
-          </button>
+          {esAdmin && (
+            <>
+              <button
+                onClick={() => navigate(`/jugador/editar/${jugador.id}`)}
+                className="bg-yellow-500 text-white px-5 py-2 rounded hover:bg-yellow-600"
+              >
+                Editar
+              </button>
+
+              <button
+                className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
+                onClick={async () => {
+                  const confirmar = window.confirm(
+                    "¿Seguro que deseas eliminar este jugador?"
+                  );
+                  if (!confirmar) return;
+
+                  await eliminarJugador(id);
+                  navigate(-1);
+                }}
+              >
+                Eliminar
+              </button>
+            </>
+          )}
 
           {jugador.equipoId && (
             <button
@@ -146,21 +168,6 @@ export default function DetalleJugador() {
               Regresar
             </button>
           )}
-
-          <button
-            className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
-            onClick={async () => {
-              const confirmar = window.confirm(
-                "¿Seguro que deseas eliminar este jugador?"
-              );
-              if (!confirmar) return;
-
-              await eliminarJugador(id);
-              navigate(-1);
-            }}
-          >
-            Eliminar
-          </button>
         </div>
 
         {/* HISTORIAL POR PARTIDO */}
@@ -207,14 +214,16 @@ export default function DetalleJugador() {
                   <td className="p-2">{stat.turnosLegales}</td>
                   <td className="p-2">{stat.S}</td>
 
-                  <td className="p-2">
-                    <button
-                      onClick={() => abrirModal(stat)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 px-4 rounded"
-                    >
-                      Editar
-                    </button>
-                  </td>
+                  {esAdmin && (
+                    <td className="p-2">
+                      <button
+                        onClick={() => abrirModal(stat)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 px-4 rounded"
+                      >
+                        Editar
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (

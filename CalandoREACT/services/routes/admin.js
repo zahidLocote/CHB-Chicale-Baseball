@@ -28,13 +28,7 @@ router.post('/', async (req, res) => {
                 message: 'Credenciales inválidas' 
             });
         }
-
-        // Verificar la contraseña
-        // Si usas bcrypt para hashear contraseñas:
-        // const passwordMatch = await bcrypt.compare(contrasena, admin.password);
-        
-        // Si la contraseña está en texto plano (NO RECOMENDADO para producción):
-        const passwordMatch = contrasena === admin.password;
+                const passwordMatch = contrasena === admin.password;
 
         if (!passwordMatch) {
             return res.status(401).json({ 
@@ -49,10 +43,10 @@ router.post('/', async (req, res) => {
             message: 'Login exitoso',
             admin: {
                 id: admin.id,
-                usuario: admin.usuario
+                usuario: admin.usuario,
+                rol: "admin"   // <<<<<<<<<<<<<< AÑADIR ESTO
             }
         });
-
     } catch (error) {
         console.error('Error en login:', error);
         res.status(500).json({ 

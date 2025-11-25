@@ -6,6 +6,8 @@ import { eliminarEquipo, obtenerEquiposPorLiga, obtenerEstadisticasPorLiga } fro
 import { obtenerLigaPorId } from '../../services/ligaService'
 import { obtenerPartidosPorLiga } from '../../services/partidoService'
 import { useParams, useLocation } from 'react-router-dom'
+import { useAuth } from "../context/AuthContext"; 
+
 
 export default function TablaEquipos() {
   const [equipos, setEquipos] = useState([])
@@ -15,6 +17,8 @@ export default function TablaEquipos() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { state } = useLocation()
+      const { esAdmin } = useAuth();
+
 
   useEffect(() => {
     if (state?.liga) {
@@ -80,13 +84,15 @@ export default function TablaEquipos() {
               tipo="equipo"
               onVer={() => navigate(`/equipos/editar/${equipo.id}`)}
               onEliminar={() => handleEliminar(equipo.id)}
+              mostrarBotones={esAdmin}
             />
           </div>
         ))}
       </div>
 
       {/* Botones superiores */}
-      <div className="flex justify-center mt-6 gap-x-5">
+      {esAdmin &&(
+        <div className="flex justify-center mt-6 gap-x-5">
         <button
           onClick={() => navigate('/nuevo', { state: { ligaId: liga?.id } })}
           className="bg-green-200 text-green-800 font-bold px-4 py-2 rounded hover:bg-green-300 cursor-pointer"
@@ -100,6 +106,8 @@ export default function TablaEquipos() {
           Registrar partido
         </button>
       </div>
+      )}
+      
 
       {/* Estadísticas */}
       <h1 className='text-center text-3xl font-bold mt-10 mb-6'>- Estadísticas por equipo -</h1>
@@ -146,7 +154,7 @@ export default function TablaEquipos() {
         ) : (
           <div className="w-300 mx-auto mb-10 space-y-10">
             {partidos.map((partido) => (
-              <InfoPartidos key={partido.id} partido={partido} />
+              <InfoPartidos key={partido.id} partido={partido} mostrarBotones={esAdmin}  />
             ))}
           </div>
         )}

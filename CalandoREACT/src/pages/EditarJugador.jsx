@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { obtenerJugadorPorId, editarJugador } from '../../services/jugadorService';
 import placeholderfoto from '../assets/placeholderfoto.jpg';
+import { AlertaPopUp } from '../components/UI/AlertaPopUp'
 
 export default function EditarJugador() {
   const { id } = useParams();
@@ -19,6 +20,15 @@ export default function EditarJugador() {
 
   const [errores, setErrores] = useState({});
 
+  // Estados para la alerta
+  const [showAlerta, setShowAlerta] = useState(false);
+  const [alertaConfig, setAlertaConfig] = useState({
+    title: '',
+    message: '',
+    type: 'error',
+    errors: {}
+  });
+
   useEffect(() => {
     obtenerJugadorPorId(id)
       .then(data => {
@@ -32,12 +42,30 @@ export default function EditarJugador() {
           foto: data.foto || ''
         });
       })
-      .catch(error => console.error('Error al cargar jugador:', error));
+      .catch(error => {
+        console.error('Error al cargar jugador:', error);
+        setAlertaConfig({
+          title: 'Error',
+          message: 'No se pudo cargar la información del jugador. Verifica que el ID sea correcto.',
+          type: 'error',
+          errors: {}
+        });
+        setShowAlerta(true);
+      });
   }, [id]);
 
   const handleChange = e => {
     const { name, value } = e.target;
     setJugador(prev => ({ ...prev, [name]: value }));
+    
+    // Limpiar error del campo cuando el usuario empieza a escribir
+    if (errores[name]) {
+      setErrores(prev => {
+        const nuevosErrores = { ...prev };
+        delete nuevosErrores[name];
+        return nuevosErrores;
+      });
+    }
   };
 
   const handleRemoveFoto = () => {
@@ -90,7 +118,18 @@ export default function EditarJugador() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!validar()) return;
+    
+    if (!validar()) {
+      // Mostrar errores de validación en la alerta
+      setAlertaConfig({
+        title: 'Error de Validación',
+        message: '',
+        type: 'error',
+        errors: errores
+      });
+      setShowAlerta(true);
+      return;
+    }
 
     try {
       await editarJugador(id, {
@@ -98,11 +137,32 @@ export default function EditarJugador() {
         numero: parseInt(jugador.numero),
         fechaNacimiento: new Date(jugador.fechaNacimiento)
       });
-      alert('Jugador actualizado correctamente');
-      navigate(`/jugador/${id}`);
+      
+      // Mostrar éxito
+      setAlertaConfig({
+        title: 'Éxito',
+        message: 'Jugador actualizado correctamente',
+        type: 'success',
+        errors: {}
+      });
+      setShowAlerta(true);
+
+      // Navegar después de cerrar la alerta
+      setTimeout(() => {
+        navigate(`/jugador/${id}`);
+      }, 1500);
+      
     } catch (error) {
       console.error('Error al editar jugador:', error);
-      alert('No se pudo actualizar el jugador');
+      
+      // Mostrar error del servidor
+      setAlertaConfig({
+        title: 'Error',
+        message: error.message || 'No se pudo actualizar el jugador. Por favor, intenta de nuevo.',
+        type: 'error',
+        errors: {}
+      });
+      setShowAlerta(true);
     }
   };
 
@@ -123,110 +183,122 @@ export default function EditarJugador() {
   ];
 
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-center">Editar Jugador</h1>
+    <>
+      <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded shadow">
+        <h1 className="text-2xl font-bold mb-4 text-center">Editar Jugador</h1>
 
-      <div className="flex flex-col items-center mb-6">
-        <img
-          src={fotoPreview}
-          alt="Foto del jugador"
-          className="w-32 h-32 object-cover rounded-full shadow mb-2"
-        />
-        {jugador.foto && (
+        <div className="flex flex-col items-center mb-6">
+          <img
+            src={fotoPreview}
+            alt="Foto del jugador"
+            className="w-32 h-32 object-cover rounded-full shadow mb-2"
+          />
+          {jugador.foto && (
+            <button
+              type="button"
+              onClick={handleRemoveFoto}
+              className="text-red-600 hover:underline text-sm"
+            >
+              Quitar foto
+            </button>
+          )}
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <input
+              type="text"
+              name="nombre"
+              value={jugador.nombre}
+              onChange={handleChange}
+              placeholder="Nombre"
+              className="w-full border px-4 py-2 rounded"
+            />
+            {errores.nombre && <p className="text-red-500 text-sm mt-1">{errores.nombre}</p>}
+          </div>
+
+          <div>
+            <input
+              type="text"
+              name="apellidoPaterno"
+              value={jugador.apellidoPaterno}
+              onChange={handleChange}
+              placeholder="Apellido Paterno"
+              className="w-full border px-4 py-2 rounded"
+            />
+            {errores.apellidoPaterno && <p className="text-red-500 text-sm mt-1">{errores.apellidoPaterno}</p>}
+          </div>
+
+          <div>
+            <input
+              type="text"
+              name="apellidoMaterno"
+              value={jugador.apellidoMaterno}
+              onChange={handleChange}
+              placeholder="Apellido Materno"
+              className="w-full border px-4 py-2 rounded"
+            />
+            {errores.apellidoMaterno && <p className="text-red-500 text-sm mt-1">{errores.apellidoMaterno}</p>}
+          </div>
+
+          <div>
+            <input
+              type="date"
+              name="fechaNacimiento"
+              value={jugador.fechaNacimiento}
+              onChange={handleChange}
+              className="w-full border px-4 py-2 rounded"
+            />
+            {errores.fechaNacimiento && <p className="text-red-500 text-sm mt-1">{errores.fechaNacimiento}</p>}
+          </div>
+
+          <div>
+            <input
+              type="number"
+              name="numero"
+              value={jugador.numero}
+              onChange={handleChange}
+              placeholder="Número"
+              className="w-full border px-4 py-2 rounded"
+            />
+            {errores.numero && <p className="text-red-500 text-sm mt-1">{errores.numero}</p>}
+          </div>
+
+          <div>
+            <select
+              name="posicion"
+              value={jugador.posicion}
+              onChange={handleChange}
+              className="border py-3 px-4 rounded w-full text-lg"
+            >
+              <option value="">Selecciona una posición</option>
+              {opcionesPosicion.map(op => (
+                <option key={op.value} value={op.value}>
+                  {op.label}
+                </option>
+              ))}
+            </select>
+            {errores.posicion && <p className="text-red-500 text-sm mt-1">{errores.posicion}</p>}
+          </div>
+
           <button
-            type="button"
-            onClick={handleRemoveFoto}
-            className="text-red-600 hover:underline text-sm"
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
           >
-            Quitar foto
+            Guardar Cambios
           </button>
-        )}
+        </form>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <input
-            type="text"
-            name="nombre"
-            value={jugador.nombre}
-            onChange={handleChange}
-            placeholder="Nombre"
-            className="w-full border px-4 py-2 rounded"
-          />
-          {errores.nombre && <p className="text-red-500 text-sm mt-1">{errores.nombre}</p>}
-        </div>
-
-        <div>
-          <input
-            type="text"
-            name="apellidoPaterno"
-            value={jugador.apellidoPaterno}
-            onChange={handleChange}
-            placeholder="Apellido Paterno"
-            className="w-full border px-4 py-2 rounded"
-          />
-          {errores.apellidoPaterno && <p className="text-red-500 text-sm mt-1">{errores.apellidoPaterno}</p>}
-        </div>
-
-        <div>
-          <input
-            type="text"
-            name="apellidoMaterno"
-            value={jugador.apellidoMaterno}
-            onChange={handleChange}
-            placeholder="Apellido Materno"
-            className="w-full border px-4 py-2 rounded"
-          />
-          {errores.apellidoMaterno && <p className="text-red-500 text-sm mt-1">{errores.apellidoMaterno}</p>}
-        </div>
-
-        <div>
-          <input
-            type="date"
-            name="fechaNacimiento"
-            value={jugador.fechaNacimiento}
-            onChange={handleChange}
-            className="w-full border px-4 py-2 rounded"
-          />
-          {errores.fechaNacimiento && <p className="text-red-500 text-sm mt-1">{errores.fechaNacimiento}</p>}
-        </div>
-
-        <div>
-          <input
-            type="number"
-            name="numero"
-            value={jugador.numero}
-            onChange={handleChange}
-            placeholder="Número"
-            className="w-full border px-4 py-2 rounded"
-          />
-          {errores.numero && <p className="text-red-500 text-sm mt-1">{errores.numero}</p>}
-        </div>
-
-        <div>
-          <select
-            name="posicion"
-            value={jugador.posicion}
-            onChange={handleChange}
-            className="border py-3 px-4 rounded w-full text-lg"
-          >
-            <option value="">Selecciona una posición</option>
-            {opcionesPosicion.map(op => (
-              <option key={op.value} value={op.value}>
-                {op.label}
-              </option>
-            ))}
-          </select>
-          {errores.posicion && <p className="text-red-500 text-sm mt-1">{errores.posicion}</p>}
-        </div>
-
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Guardar Cambios
-        </button>
-      </form>
-    </div>
+      {/* Alerta PopUp */}
+      <AlertaPopUp
+        show={showAlerta}
+        onClose={() => setShowAlerta(false)}
+        title={alertaConfig.title}
+        message={alertaConfig.message}
+        type={alertaConfig.type}
+        errors={alertaConfig.errors}
+      />
+    </>
   );
 }

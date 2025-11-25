@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { verificarCredenciales } from '../../services/adminService';
 import { AlertaPopUp } from '../components/UI/AlertaPopUp';
+import { useAuth } from "../context/AuthContext";
+
 
 export default function LogIn(){
     const navigate = useNavigate();
@@ -15,6 +17,9 @@ export default function LogIn(){
         type: 'error'
     });
     const [loading, setLoading] = useState(false);
+    const { login } = useAuth();
+
+
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -24,22 +29,20 @@ export default function LogIn(){
             const response = await verificarCredenciales(usuario, contrasena);
             
             if (response.success) {
-                // Mostrar alerta de éxito
+                login(response.admin);  // ahora sí envías el objeto completo con rol  // <<< IMPORTANTE
+
                 setAlertConfig({
                     title: 'Éxito',
                     message: 'Inicio de sesión exitoso. Redirigiendo...',
                     type: 'success'
                 });
+    
                 setShowAlert(true);
-
-                // Guardar datos del usuario en localStorage
-                localStorage.setItem('admin', JSON.stringify(response.admin));
-                
-                // Redirigir después de 1.5 segundos
                 setTimeout(() => {
-                    navigate('/'); // Ajusta la ruta según tu aplicación
+                    navigate('/');
                 }, 1500);
             }
+
         } catch (err) {
             // Mostrar alerta de error
             setAlertConfig({

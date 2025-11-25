@@ -4,12 +4,15 @@ import { obtenerLigas } from '../../services/ligaService'
 import { useNavigate } from 'react-router-dom';
 import EliminarPopUp from "../components/UI/eliminarPopUp";
 import { eliminarLiga } from "../../services/ligaService";
+import { useAuth } from "../context/AuthContext"; 
+
 
 
 export default function VentanaPrincipal(){
     const [ligas, setLigas] = useState([])
     const navigate = useNavigate();
     const [ligaEliminar, setLigaEliminar] = useState(null)
+    const { esAdmin, refreshAuth } = useAuth();
 
     const cargarLigas = async () => {
         try {
@@ -21,6 +24,7 @@ export default function VentanaPrincipal(){
     };
 
     useEffect(() => {
+        refreshAuth(); // Refresca el estado de autenticación
         cargarLigas();
     }, []);
 
@@ -77,6 +81,7 @@ export default function VentanaPrincipal(){
                             tipo="liga"
                             onVer={() => handleVer(liga)}
                             onEliminar={() => handleEliminar(liga)}
+                            mostrarBotones={esAdmin} 
                              />
                         </div>
 
@@ -88,10 +93,14 @@ export default function VentanaPrincipal(){
                     onConfirmar={confirmarEliminacion}
                     onCancelar={cancelarEliminacion}
                 />
+
             <div className="flex justify-center mt-6">
-                <button onClick={() => navigate('ligas/nuevo')} className="bg-green-200 text-green-800 font-semibold px-4 py-2 rounded hover:bg-green-300 cursor-pointer">
-                    Agregar Liga
-                </button>
+                {esAdmin && (
+                    <button 
+                        onClick={() => navigate('ligas/nuevo')} 
+                        className="bg-green-200 text-green-800 hover:bg-green-300 cursor-pointer px-4 py-2 rounded font-semibold">
+                            Agregar Liga
+                    </button>)}
             </div>
         </>
     )
