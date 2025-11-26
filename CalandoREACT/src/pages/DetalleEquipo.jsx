@@ -9,7 +9,6 @@ import AltaJugador from './AltaJugador'
 import BannerLiga from '../components/UI/BannerLiga'
 import { useAuth } from '../context/AuthContext'
 
-
 export default function DetalleEquipo() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -24,6 +23,7 @@ export default function DetalleEquipo() {
     obtenerEquipoPorId(id)
       .then(data => {
         setEquipo(data)
+
         if (data.ligaId) {
           obtenerLigaPorId(data.ligaId).then(setLiga).catch(console.error)
           obtenerEquiposPorLiga(data.ligaId).then(setEquiposLiga).catch(console.error)
@@ -38,27 +38,27 @@ export default function DetalleEquipo() {
 
   if (!equipo) return <p className="text-center mt-8">Cargando equipo...</p>
 
-  const logo = equipo.logo ? `/uploads/${equipo.logo}` : placeholderfoto
+  // ✔ Usamos URL completa del backend
+  const logo = equipo.logoUrl || placeholderfoto
 
   return (
     <>
-      {/* Banner fuera de la tarjeta */}
       <BannerLiga liga={liga} equipos={equiposLiga} />
 
-      {/* Datos del equipo */}
       <div className="text-center mt-6">
         <h1 className="text-3xl font-bold mb-4">{equipo.nombre}</h1>
+
         <img
           src={logo}
           alt={equipo.nombre}
           className="w-40 h-40 object-cover rounded-full mx-auto mb-4 shadow"
         />
+
         <p><strong>ID:</strong> 000{equipo.id}</p>
         <p><strong>Entrenador:</strong> {equipo.entrenador}</p>
         <p><strong>Liga:</strong> {equipo.ligaId || 'N/A'}</p>
       </div>
 
-      {/* Botones */}
       <div className="flex justify-center gap-4 mt-6">
         {esAdmin && (
           <>
@@ -76,6 +76,7 @@ export default function DetalleEquipo() {
             </button>
           </>
         )}
+
         <button
           onClick={() => navigate(-1)}
           className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-400 mb-12"
@@ -83,51 +84,51 @@ export default function DetalleEquipo() {
           Regresar
         </button>
       </div>
+
       <div
-  className="w-full h-[80px] mb-6 shadow-md"
-  style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
-></div>
+        className="w-full h-[80px] mb-6 shadow-md"
+        style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
+      ></div>
 
-      {/* Tabla de jugadores */}
-<div className="mt-10 mb-12">
-  <h2 className="text-2xl font-semibold mb-4 text-center font-race">
-    Jugadores del Equipo
-  </h2>
-  <table className="min-w-full border overflow-hidden shadow">
-  <thead
-    className="text-white"
-    style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
-  >
-      <tr>
-        <th className="py-3 px-4 text-left">#</th>
-        <th className="py-3 px-4 text-left">Nombre</th>
-        <th className="py-3 px-4 text-left">Posición</th>
-        <th className="py-3 px-4 text-left">Número</th>
-        <th className="py-3 px-4 text-left">Fecha Nacimiento</th>
-      </tr>
-    </thead>
-    <tbody>
-      {jugadores.map((jugador, index) => (
-        <tr
-          key={jugador.id}
-          className="border-b hover:bg-blue-900/40 transition cursor-pointer"
-          onClick={() => navigate(`/jugador/${jugador.id}`)}
-        >
-          <td className="py-2 px-4">{index + 1}</td>
-          <td className="py-2 px-4">{jugador.nombre}</td>
-          <td className="py-2 px-4">{jugador.posicion}</td>
-          <td className="py-2 px-4">{jugador.numero}</td>
-          <td className="py-2 px-4">
-            {new Date(jugador.fechaNacimiento).toLocaleDateString("es-MX")}
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+      <div className="mt-10 mb-12">
+        <h2 className="text-2xl font-semibold mb-4 text-center font-race">
+          Jugadores del Equipo
+        </h2>
 
+        <table className="min-w-full border overflow-hidden shadow">
+          <thead
+            className="text-white"
+            style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
+          >
+            <tr>
+              <th className="py-3 px-4 text-left">#</th>
+              <th className="py-3 px-4 text-left">Nombre</th>
+              <th className="py-3 px-4 text-left">Posición</th>
+              <th className="py-3 px-4 text-left">Número</th>
+              <th className="py-3 px-4 text-left">Fecha Nacimiento</th>
+            </tr>
+          </thead>
 
-      {/* Modal de alta de jugador */}
+          <tbody>
+            {jugadores.map((jugador, index) => (
+              <tr
+                key={jugador.id}
+                className="border-b hover:bg-blue-900/40 transition cursor-pointer"
+                onClick={() => navigate(`/jugador/${jugador.id}`)}
+              >
+                <td className="py-2 px-4">{index + 1}</td>
+                <td className="py-2 px-4">{jugador.nombre}</td>
+                <td className="py-2 px-4">{jugador.posicion}</td>
+                <td className="py-2 px-4">{jugador.numero}</td>
+                <td className="py-2 px-4">
+                  {new Date(jugador.fechaNacimiento).toLocaleDateString("es-MX")}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       {mostrarModal && (
         <AltaJugador
           equipoId={equipo.id}

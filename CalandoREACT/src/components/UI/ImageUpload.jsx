@@ -8,7 +8,7 @@ export function ImageUpload({
   imagePreview = null,
   error = null,
   required = false,
-  maxSizeMB = 5,
+  maxSizeMB = 15,
   acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png'],
   placeholder = "Click para subir tu imagen",
   helpText = "PNG y JPG",

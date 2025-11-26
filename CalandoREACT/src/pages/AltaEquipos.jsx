@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { crearEquipo } from '../../services/equipoService'
-import PictureBox from '../components/UI/PictureBox'
-import useFormValidation from '../hooks/useFormValidation'
-import { useLocation } from 'react-router-dom'
-import { AlertaPopUp } from '../components/UI/AlertaPopUp'
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { crearEquipo } from '../../services/equipoService';
+import { ImageUpload } from '../components/UI/ImageUpload';
+import useFormValidation from '../hooks/useFormValidation';
+import { AlertaPopUp } from '../components/UI/AlertaPopUp';
 
 export default function AltaEquipos() {
     const navigate = useNavigate();
     const location = useLocation();
-
     const { validarEquipos } = useFormValidation();
+
     const [nombre, setNombre] = useState('');
     const [entrenador, setEntrenador] = useState('');
     const [ligaId, setLigaId] = useState(null);
     const [logo, setLogo] = useState(null);
+    const [preview, setPreview] = useState(null);
 
     const [showAlerta, setShowAlerta] = useState(false);
     const [alertaConfig, setAlertaConfig] = useState({
@@ -25,19 +25,17 @@ export default function AltaEquipos() {
     });
 
     useEffect(() => {
-        // Toma el id de la liga madre si fue enviada
         if (location.state?.ligaId) {
             setLigaId(location.state.ligaId);
         }
     }, [location.state]);
 
-
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        const errores = validarEquipos({ nombre, entrenador })
+        e.preventDefault();
+
+        const errores = validarEquipos({ nombre, entrenador });
 
         if (Object.keys(errores).length > 0) {
-            // Mostrar errores en la alerta
             setAlertaConfig({
                 title: 'Error de Validación',
                 message: '',
@@ -45,15 +43,17 @@ export default function AltaEquipos() {
                 errors: errores
             });
             setShowAlerta(true);
-            return
+            return;
         }
-        try{
-            await crearEquipo({ nombre, entrenador, logo, ligaId })
-            setNombre('')
-            setEntrenador('')
-            setLogo(null)
 
-            // Mostrar éxito
+        try {
+            await crearEquipo({ nombre, entrenador, logo, ligaId });
+
+            setNombre('');
+            setEntrenador('');
+            setLogo(null);
+            setPreview(null);
+
             setAlertaConfig({
                 title: 'Éxito',
                 message: 'Equipo registrado exitosamente',
@@ -61,15 +61,21 @@ export default function AltaEquipos() {
                 errors: {}
             });
             setShowAlerta(true);
-            
-            // Navegar después de cerrar la alerta
+
             setTimeout(() => {
-                navigate('/')
+                navigate('/');
             }, 1500);
-        }catch(error){
-            console.error(error)
+        } catch (error) {
+            console.error(error);
+            setAlertaConfig({
+                title: 'Error',
+                message: 'Error al registrar el equipo',
+                type: 'error',
+                errors: {}
+            });
+            setShowAlerta(true);
         }
-    }
+    };
 
     return (
         <>
@@ -78,7 +84,6 @@ export default function AltaEquipos() {
 
                 <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
                     <div className="flex flex-row gap-6">
-                        {/* Campos de texto */}
                         <div className="flex flex-col flex-1 space-y-15">
                             <input
                                 type="text"
@@ -87,6 +92,7 @@ export default function AltaEquipos() {
                                 onChange={(e) => setNombre(e.target.value)}
                                 className="border p-2 w-full rounded text-center placeholder:text-center max-w-sm"
                             />
+
                             <input
                                 type="text"
                                 placeholder="Entrenador"
@@ -96,13 +102,25 @@ export default function AltaEquipos() {
                             />
                         </div>
 
-                        {/* PictureBox */}
-                        <div className="flex flex-col items-center space-y-2 pt-1">
-                            <PictureBox editable={true} onImageChange={(file) => setLogo(file)} />
-                        </div>
+                        {/* ImageUpload con preview CORRECTO */}
+                        <ImageUpload
+                            label="Logo del equipo"
+                            imagePreview={preview}
+                            onImageChange={(file, error, previewUrl) => {
+                                if (error) {
+                                    console.error("Error imagen:", error);
+                                    return;
+                                }
+                                setLogo(file);        // archivo real
+                                setPreview(previewUrl);  // preview
+                            }}
+                            onImageRemove={() => {
+                                setLogo(null);
+                                setPreview(null);
+                            }}
+                        />
                     </div>
 
-                    {/* Botones */}
                     <div className="flex justify-center gap-4">
                         <button
                             type="button"
@@ -111,6 +129,7 @@ export default function AltaEquipos() {
                         >
                             CANCELAR
                         </button>
+
                         <button
                             type="submit"
                             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800"
@@ -120,7 +139,7 @@ export default function AltaEquipos() {
                     </div>
                 </form>
             </div>
-            {/* Alerta PopUp */}
+
             <AlertaPopUp
                 show={showAlerta}
                 onClose={() => setShowAlerta(false)}
@@ -130,5 +149,5 @@ export default function AltaEquipos() {
                 errors={alertaConfig.errors}
             />
         </>
-    )
+    );
 }

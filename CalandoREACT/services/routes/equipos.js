@@ -1,19 +1,35 @@
+
+
 import express from 'express';
 import { PrismaClient } from '../generated/prisma/index.js';
+import multer from 'multer';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// Configuración de multer para guardar imágenes
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Carpeta donde se guardan
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + file.originalname;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({ storage });
+
 // Crear equipo
-router.post('/', async (req, res) => {
-  const { nombre, entrenador, logo, ligaId } = req.body;
+router.post('/', upload.single('logo'), async (req, res) => {
+  const { nombre, entrenador, ligaId } = req.body;
 
   try {
     const nuevo = await prisma.equipo.create({
       data: {
         nombre,
         entrenador,
-        logo: logo || null,
+        logo: req.file ? req.file.filename : null,  // archivo guardado
         liga: ligaId ? { connect: { id: Number(ligaId) } } : undefined
       }
     });
@@ -58,27 +74,32 @@ router.get('/:id', async (req, res) => {
   }
 });
 // Editar
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.single('logo'), async (req, res) => {
   const id = Number(req.params.id);
-  const { nombre, entrenador, logo, ligaId } = req.body;
+  const { nombre, entrenador, ligaId, logoActual } = req.body;
 
   try {
+    const nuevoLogo = req.file ? req.file.filename : logoActual || null;
+
     const actualizado = await prisma.equipo.update({
       where: { id },
       data: {
         nombre,
         entrenador,
-        logo,
+        logo: nuevoLogo,
         liga: ligaId ? { connect: { id: Number(ligaId) } } : undefined
       }
     });
 
     res.json(actualizado);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al editar equipo' });
   }
 });
+
+
 // Eliminar
 router.delete('/:id', async (req, res) => {
   const id = Number(req.params.id);
