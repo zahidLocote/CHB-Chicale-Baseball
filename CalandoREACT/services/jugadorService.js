@@ -1,16 +1,23 @@
 const BASE_URL = 'http://localhost:3001/api/jugadores';
 
-// Crear jugador
+// Crear jugador (con imagen)
 export async function crearJugador(jugador) {
+  const formData = new FormData();
+
+  Object.keys(jugador).forEach(key => {
+    if (jugador[key] !== null) {
+      formData.append(key, jugador[key]);
+    }
+  });
+
   const res = await fetch(BASE_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(jugador)
+    body: formData
   });
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Error al registrar jugador');
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Error al registrar jugador');
   }
 
   return await res.json();

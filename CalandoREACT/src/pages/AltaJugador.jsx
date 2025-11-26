@@ -1,9 +1,10 @@
 import { useState } from "react";
-import defaultPlayer from '../assets/picture.jpg';
 import { crearJugador } from '../../services/jugadorService';
-import { AlertaPopUp } from '../components/UI/AlertaPopUp'
+import { ImageUpload } from '../components/UI/ImageUpload';
+import { AlertaPopUp } from '../components/UI/AlertaPopUp';
 
 export default function AltaJugador({ equipoId, onClose }) {
+
   const [form, setForm] = useState({
     nombre: "",
     apellidoPaterno: "",
@@ -12,9 +13,9 @@ export default function AltaJugador({ equipoId, onClose }) {
     numero: "",
     posicion: "",
     foto: null,
+    fotoPreview: null,
   });
 
-  // Estados para la alerta
   const [showAlerta, setShowAlerta] = useState(false);
   const [alertaConfig, setAlertaConfig] = useState({
     title: '',
@@ -23,65 +24,46 @@ export default function AltaJugador({ equipoId, onClose }) {
     errors: {}
   });
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setForm({ ...form, [name]: files ? files[0] : value });
-  };
+  const handleImageChange = (file, error, preview) => {
+    if (error) {
+      setAlertaConfig({
+        title: "Error",
+        message: error,
+        type: "error",
+        errors: {}
+      });
+      setShowAlerta(true);
+      return;
+    }
 
-  const hayDatosLlenados = () => {
-    return Object.values(form).some((valor) => {
-      if (typeof valor === "string") return valor.trim() !== "";
-      return valor !== null;
+    setForm({
+      ...form,
+      foto: file,
+      fotoPreview: preview
     });
   };
 
-  const handleCancelar = () => {
-    if (hayDatosLlenados()) {
-      const confirmar = window.confirm("Hay datos llenados. ¿Seguro que deseas cancelar?");
-      if (!confirmar) return;
-    }
-    onClose();
-  };
+  const validar = () => {
+    const errors = {};
 
-  // Validar el formulario
-  const validarFormulario = () => {
-    const errores = {};
+    if (!form.nombre.trim()) errors.nombre = "El nombre es obligatorio";
+    if (!form.apellidoPaterno.trim()) errors.apellidoPaterno = "El apellido paterno es obligatorio";
+    if (!form.fechaNacimiento) errors.fechaNacimiento = "La fecha es obligatoria";
+    if (!form.numero) errors.numero = "Número requerido";
+    if (!form.posicion) errors.posicion = "Posición requerida";
 
-    if (!form.nombre.trim()) {
-      errores.nombre = "El nombre es obligatorio";
-    }
-
-    if (!form.apellidoPaterno.trim()) {
-      errores.apellidoPaterno = "El apellido paterno es obligatorio";
-    }
-
-    if (!form.fechaNacimiento) {
-      errores.fechaNacimiento = "La fecha de nacimiento es obligatoria";
-    }
-
-    if (!form.numero || form.numero <= 0) {
-      errores.numero = "El número debe ser mayor a 0";
-    }
-
-    if (!form.posicion) {
-      errores.posicion = "La posición es obligatoria";
-    }
-
-    return errores;
+    return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar formulario
-    const errores = validarFormulario();
-    
-    if (Object.keys(errores).length > 0) {
+    const errors = validar();
+    if (Object.keys(errors).length > 0) {
       setAlertaConfig({
         title: 'Error de Validación',
-        message: '',
         type: 'error',
-        errors: errores
+        errors
       });
       setShowAlerta(true);
       return;
@@ -92,38 +74,29 @@ export default function AltaJugador({ equipoId, onClose }) {
       apellidoPaterno: form.apellidoPaterno,
       apellidoMaterno: form.apellidoMaterno || "N/A",
       fechaNacimiento: form.fechaNacimiento,
-      numero: parseInt(form.numero),
+      numero: form.numero,
       posicion: form.posicion,
-      foto: null,
-      equipoId: equipoId
+      foto: form.foto,
+      equipoId
     };
 
     try {
       const result = await crearJugador(jugador);
-      
-      // Mostrar éxito
+
       setAlertaConfig({
         title: 'Éxito',
-        message: result.message || 'Jugador registrado exitosamente',
-        type: 'success',
-        errors: {}
+        message: result.message,
+        type: 'success'
       });
       setShowAlerta(true);
 
-      // Cerrar después de un breve delay
-      setTimeout(() => {
-        onClose();
-      }, 1500);
-      
+      setTimeout(() => onClose(), 1500);
+
     } catch (error) {
-      console.error(error);
-      
-      // Mostrar error del servidor
       setAlertaConfig({
         title: 'Error',
-        message: error.message || 'Error al registrar jugador. Por favor, intenta de nuevo.',
-        type: 'error',
-        errors: {}
+        message: error.message,
+        type: 'error'
       });
       setShowAlerta(true);
     }
@@ -132,56 +105,61 @@ export default function AltaJugador({ equipoId, onClose }) {
   return (
     <>
       <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl shadow-xl p-10 w-[1200px] h-[720px]">
-          <h2 style={{ fontFamily: 'MiFuente' }} className="text-4xl font-bold mb-6 text-center">
+        <div className="bg-white rounded-2xl shadow-xl p-10 w-[1100px]">
+
+          <h2 className="text-4xl font-bold text-center mb-6">
             Registro de Jugador
           </h2>
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-12 h-[520px]">
+          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-12">
+
+            {/* Inputs */}
             <div className="space-y-5">
-              <input 
-                type="text" 
-                name="nombre" 
-                placeholder="Nombre(s)" 
+
+              <input
+                name="nombre"
                 value={form.nombre}
-                onChange={handleChange} 
-                className="border py-4 px-3 rounded w-[600px] text-lg" 
+                onChange={e => setForm({ ...form, nombre: e.target.value })}
+                placeholder="Nombre(s)"
+                className="border p-3 rounded w-full"
               />
-              <input 
-                type="text" 
-                name="apellidoPaterno" 
-                placeholder="Apellido Paterno" 
+
+              <input
+                name="apellidoPaterno"
                 value={form.apellidoPaterno}
-                onChange={handleChange} 
-                className="border py-4 px-3 rounded w-[600px] text-lg" 
+                onChange={e => setForm({ ...form, apellidoPaterno: e.target.value })}
+                placeholder="Apellido Paterno"
+                className="border p-3 rounded w-full"
               />
-              <input 
-                type="text" 
-                name="apellidoMaterno" 
-                placeholder="Apellido Materno (Opcional)" 
+
+              <input
+                name="apellidoMaterno"
                 value={form.apellidoMaterno}
-                onChange={handleChange} 
-                className="border py-4 px-3 rounded w-[600px] text-lg" 
+                onChange={e => setForm({ ...form, apellidoMaterno: e.target.value })}
+                placeholder="Apellido Materno"
+                className="border p-3 rounded w-full"
               />
-              <input 
-                type="date" 
-                name="fechaNacimiento" 
+
+              <input
+                type="date"
+                name="fechaNacimiento"
                 value={form.fechaNacimiento}
-                onChange={handleChange} 
-                className="border py-4 px-3 rounded w-[600px] text-lg" 
+                onChange={e => setForm({ ...form, fechaNacimiento: e.target.value })}
+                className="border p-3 rounded w-full"
               />
-              <select 
-                name="posicion" 
+
+              <select
+                name="posicion"
                 value={form.posicion}
-                onChange={handleChange} 
-                className="border py-4 px-3 rounded w-[600px] text-lg"
+                onChange={e => setForm({ ...form, posicion: e.target.value })}
+                className="border p-3 rounded w-full"
               >
                 <option value="">Posición</option>
                 <option value="P">Pitcher</option>
                 <option value="C">Catcher</option>
-                <option value="PrimeraBase">Primera Base</option>
-                <option value="SegundaBase">Segunda Base</option>
-                <option value="TerceraBase">Tercera Base</option>
+                <option value="1B">Primera Base</option>
+                <option value="2B">Segunda Base</option>
+                <option value="3B">Tercera Base</option>
                 <option value="SS">Shortstop</option>
                 <option value="LF">Jardinero Izquierdo</option>
                 <option value="CF">Jardinero Central</option>
@@ -189,59 +167,50 @@ export default function AltaJugador({ equipoId, onClose }) {
                 <option value="DH">Bateador Designado</option>
                 <option value="SUB">Suplente</option>
               </select>
-              <input 
-                type="number" 
-                name="numero" 
-                placeholder="Número" 
+
+              <input
+                type="number"
+                name="numero"
                 value={form.numero}
-                onChange={handleChange} 
-                className="border py-4 px-3 rounded w-[600px] text-lg" 
+                onChange={e => setForm({ ...form, numero: e.target.value })}
+                placeholder="Número"
+                className="border p-3 rounded w-full"
+              />
+
+            </div>
+
+            {/* Upload component */}
+            <div className="flex flex-col items-center justify-center">
+              <ImageUpload
+                label="Foto del jugador"
+                name="foto"
+                imagePreview={form.fotoPreview}
+                onImageChange={handleImageChange}
+                onImageRemove={() => setForm({ ...form, foto: null, fotoPreview: null })}
               />
             </div>
 
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-100 h-[420px] border-2 border-gray-300 flex items-center justify-center overflow-hidden bg-gray-100 rounded-md">
-                <img 
-                  src={form.foto ? URL.createObjectURL(form.foto) : defaultPlayer} 
-                  alt="preview" 
-                  className="w-full h-full object-cover" 
-                />
-              </div>
-              <label className="mt-4 cursor-pointer bg-gray-200 px-4 py-2 rounded shadow flex items-center gap-2 text-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-                </svg>
-                Subir Foto
-                <input 
-                  type="file" 
-                  name="foto" 
-                  accept="image/*" 
-                  onChange={handleChange} 
-                  className="hidden" 
-                />
-              </label>
+            <div className="col-span-2 flex justify-center gap-6 mt-6">
+              <button
+                type="button"
+                onClick={onClose}
+                className="bg-red-600 text-white px-6 py-2 rounded"
+              >
+                Cancelar
+              </button>
 
-              <div className="flex gap-6 mt-8 justify-center">
-                <button 
-                  type="button" 
-                  onClick={handleCancelar} 
-                  className="bg-red-600 text-white px-8 py-4 rounded shadow text-xl"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  className="bg-green-600 text-white px-8 py-4 rounded shadow text-xl"
-                >
-                  Agregar
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="bg-green-600 text-white px-6 py-2 rounded"
+              >
+                Agregar
+              </button>
             </div>
+
           </form>
         </div>
       </div>
 
-      {/* Alerta PopUp */}
       <AlertaPopUp
         show={showAlerta}
         onClose={() => setShowAlerta(false)}

@@ -38,7 +38,7 @@ export default function DetalleEquipo() {
 
   if (!equipo) return <p className="text-center mt-8">Cargando equipo...</p>
 
-  // ✔ Usamos URL completa del backend
+  // Usamos URL completa del backend
   const logo = equipo.logoUrl || placeholderfoto
 
   return (
@@ -59,27 +59,19 @@ export default function DetalleEquipo() {
         <p><strong>Liga:</strong> {equipo.ligaId || 'N/A'}</p>
       </div>
 
-      <div className="flex justify-center gap-4 mt-6">
+      <div className="flex justify-center gap-4 mt-6 flex-wrap">
         {esAdmin && (
-          <>
-            <button className="bg-blue-300 text-blue-700 font-bold px-4 py-2 rounded-xl hover:bg-blue-200">
-              Editar
-            </button>
-            <button className="bg-red-300 text-red-700 font-bold px-4 py-2 rounded-xl hover:bg-red-200">
-              Eliminar
-            </button>
-            <button
-              className="bg-green-300 text-green-700 font-bold px-4 py-2 rounded-xl hover:bg-green-200"
-              onClick={() => setMostrarModal(true)}
-            >
-              Agregar Jugador
-            </button>
-          </>
+          <button
+            className="bg-green-300 text-green-700 font-bold px-4 py-2 rounded-lg hover:bg-green-200 w-36 text-center"
+            onClick={() => setMostrarModal(true)}
+          >
+            Agregar
+          </button>
         )}
 
         <button
           onClick={() => navigate(-1)}
-          className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-400 mb-12"
+          className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-400 w-36 text-center"
         >
           Regresar
         </button>

@@ -1,16 +1,26 @@
 import express from 'express';
 import { PrismaClient } from '../generated/prisma/index.js';
+import multer from 'multer';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Crear
-router.post('/', async (req, res) => {
-  const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, numero, posicion, foto, equipoId } = req.body;
-
-  if (!nombre || !apellidoPaterno || !fechaNacimiento || !numero || !posicion || !equipoId) {
-    return res.status(400).json({ message: 'Todos los campos obligatorios deben estar llenos' });
+// Storage multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + file.originalname;
+    cb(null, unique);
   }
+});
+
+const upload = multer({ storage });
+
+// Crear jugador con imagen
+router.post('/', upload.single('foto'), async (req, res) => {
+  const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, numero, posicion, equipoId } = req.body;
 
   try {
     const nuevo = await prisma.jugador.create({
@@ -21,11 +31,12 @@ router.post('/', async (req, res) => {
         fechaNacimiento: new Date(fechaNacimiento),
         numero: Number(numero),
         posicion,
-        foto: foto || null,
+        foto: req.file ? req.file.filename : null,
         equipo: { connect: { id: Number(equipoId) } }
       }
     });
-    res.json(nuevo);
+
+    res.json({ message: "Jugador registrado exitosamente", jugador: nuevo });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error al registrar jugador' });
