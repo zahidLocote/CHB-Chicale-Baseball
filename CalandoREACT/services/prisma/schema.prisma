@@ -143,3 +143,9 @@ model EstadisticaJugadorTotal {
   
   @@unique([jugadorId, equipoId])
 }
+
+model administrador{
+  id             Int      @id @default(autoincrement())
+  usuario        String   @unique
+  password       String
+}

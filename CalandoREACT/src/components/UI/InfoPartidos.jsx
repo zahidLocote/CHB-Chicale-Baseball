@@ -3,7 +3,7 @@ import { eliminarPartido } from '../../../services/partidoService';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function InfoPartidos({ partido }) {
+export default function InfoPartidos({ partido, mostrarBotones = true  }) {
   const navigate = useNavigate();
   const [mostrarModal, setMostrarModal] = useState(false);
   const [equipoActual, setEquipoActual] = useState(1)
@@ -69,7 +69,8 @@ export default function InfoPartidos({ partido }) {
           </div>
 
           {/* Botones alineados a la derecha */}
-          <div className="flex flex-col gap-2">
+          {mostrarBotones && (
+            <div className="flex flex-col gap-2">
             <button
               onClick={() => navigate(`/partido/editar/${partido.id}`)}
               className="bg-blue-300 text-blue-500 font-bold px-4 py-2 rounded-xl hover:bg-blue-200"
@@ -86,6 +87,7 @@ export default function InfoPartidos({ partido }) {
               Resultados
             </button>
           </div>
+          )}
         </div>
       </div>
       {/*Modal de resultados */}

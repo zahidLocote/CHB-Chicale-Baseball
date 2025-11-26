@@ -7,6 +7,8 @@ import { obtenerEquiposPorLiga } from '../../services/equipoService'
 import placeholderfoto from '../assets/placeholderfoto.jpg'
 import AltaJugador from './AltaJugador'
 import BannerLiga from '../components/UI/BannerLiga'
+import { useAuth } from '../context/AuthContext'
+
 
 export default function DetalleEquipo() {
   const { id } = useParams()
@@ -16,6 +18,7 @@ export default function DetalleEquipo() {
   const [mostrarModal, setMostrarModal] = useState(false)
   const [liga, setLiga] = useState(null)
   const [equiposLiga, setEquiposLiga] = useState([])
+  const { esAdmin } = useAuth()
 
   useEffect(() => {
     obtenerEquipoPorId(id)
@@ -57,18 +60,22 @@ export default function DetalleEquipo() {
 
       {/* Botones */}
       <div className="flex justify-center gap-4 mt-6">
-        <button className="bg-blue-300 text-blue-700 font-bold px-4 py-2 rounded-xl hover:bg-blue-200 mb-12">
-          Editar
-        </button>
-        <button className="bg-red-300 text-red-700 font-bold px-4 py-2 rounded-xl hover:bg-red-200 mb-12">
-          Eliminar
-        </button>
-        <button
-          className="bg-green-300 text-green-700 font-bold px-4 py-2 rounded-xl hover:bg-green-200 mb-12"
-          onClick={() => setMostrarModal(true)}
-        >
-          Agregar Jugador
-        </button>
+        {esAdmin && (
+          <>
+            <button className="bg-blue-300 text-blue-700 font-bold px-4 py-2 rounded-xl hover:bg-blue-200">
+              Editar
+            </button>
+            <button className="bg-red-300 text-red-700 font-bold px-4 py-2 rounded-xl hover:bg-red-200">
+              Eliminar
+            </button>
+            <button
+              className="bg-green-300 text-green-700 font-bold px-4 py-2 rounded-xl hover:bg-green-200"
+              onClick={() => setMostrarModal(true)}
+            >
+              Agregar Jugador
+            </button>
+          </>
+        )}
         <button
           onClick={() => navigate(-1)}
           className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded hover:bg-gray-400 mb-12"

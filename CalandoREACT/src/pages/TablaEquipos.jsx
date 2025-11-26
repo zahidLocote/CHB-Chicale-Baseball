@@ -8,6 +8,8 @@ import { obtenerPartidosPorLiga } from '../../services/partidoService'
 import { useParams, useLocation } from 'react-router-dom'
 import BannerLiga from '../components/UI/BannerLiga'
 import SlideshowLiga from '../components/UI/SlideShowLiga'
+import { useAuth } from "../context/AuthContext";
+
 
 export default function TablaEquipos() {
   const [equipos, setEquipos] = useState([])
@@ -17,6 +19,8 @@ export default function TablaEquipos() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { state } = useLocation()
+  const { esAdmin } = useAuth();
+
 
   useEffect(() => {
     if (state?.liga) {
@@ -62,7 +66,7 @@ export default function TablaEquipos() {
 
   return (
     <>
-    <BannerLiga liga={liga} equipos={equipos} />
+      <BannerLiga liga={liga} equipos={equipos} />
       <SlideshowLiga liga={liga} equipos={equipos} />
 
       <h1 className='text-center text-3xl font-race mt-12'>
@@ -78,30 +82,29 @@ export default function TablaEquipos() {
               tipo="equipo"
               onVer={() => navigate(`/equipos/editar/${equipo.id}`)}
               onEliminar={() => handleEliminar(equipo.id)}
+              mostrarBotones={esAdmin}
             />
           </div>
         ))}
       </div>
 
       {/* Botones superiores */}
-      <div className="flex justify-center mt-6 gap-x-5">
-        <button
-          onClick={() => navigate('/nuevo', { state: { ligaId: liga?.id } })}
-          className="bg-green-200 text-green-800 font-bold px-4 py-2 rounded hover:bg-green-300 cursor-pointer mb-6"
-        >
-          Agregar Equipo
-        </button>
-        <button
-          onClick={() => navigate('/partidoNuevo', { state: { liga } })}
-          className="bg-gray-300 text-gray-600 font-bold px-4 py-2 rounded hover:bg-gray-200 cursor-pointer mb-6"
-        >
-          Registrar partido
-        </button>
-      </div>
-      <div
-  className="w-full h-[80px] mb-6 shadow-md"
-  style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
-></div>
+      {esAdmin && (
+        <div className="flex justify-center mt-6 gap-x-5">
+          <button
+            onClick={() => navigate('/nuevo', { state: { ligaId: liga?.id } })}
+            className="bg-green-200 text-green-800 font-bold px-4 py-2 rounded hover:bg-green-300 cursor-pointer"
+          >
+            Agregar Equipo
+          </button>
+          <button
+            onClick={() => navigate('/partidoNuevo', { state: { liga } })}
+            className="bg-gray-300 text-gray-600 font-bold px-4 py-2 rounded hover:bg-gray-200 cursor-pointer"
+          >
+            Registrar partido
+          </button>
+        </div>
+      )}
 
       {/* Estadísticas */}
       <h1 className='text-center text-3xl font-bold mt-10 mb-6 font-race'>- Estadísticas por equipo -</h1>
@@ -138,9 +141,9 @@ export default function TablaEquipos() {
         </table>
       </div>
       <div
-  className="w-full h-[80px] mb-6 shadow-md"
-  style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
-></div>
+        className="w-full h-[80px] mb-6 shadow-md"
+        style={{ background: 'linear-gradient(to right, #002878, #0031AD)' }}
+      ></div>
 
       {/* Partidos */}
       <h1 className='text-center text-3xl font-bold mb-10 font-race'>- Partidos -</h1>
@@ -152,7 +155,7 @@ export default function TablaEquipos() {
         ) : (
           <div className="w-300 mx-auto mb-10 space-y-10">
             {partidos.map((partido) => (
-              <InfoPartidos key={partido.id} partido={partido} />
+              <InfoPartidos key={partido.id} partido={partido} mostrarBotones={esAdmin} />
             ))}
           </div>
         )}

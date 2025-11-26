@@ -4,7 +4,7 @@ import { crearEquipo } from '../../services/equipoService'
 import PictureBox from '../components/UI/PictureBox'
 import useFormValidation from '../hooks/useFormValidation'
 import { useLocation } from 'react-router-dom'
-
+import { AlertaPopUp } from '../components/UI/AlertaPopUp'
 
 export default function AltaEquipos() {
     const navigate = useNavigate();
@@ -15,6 +15,14 @@ export default function AltaEquipos() {
     const [entrenador, setEntrenador] = useState('');
     const [ligaId, setLigaId] = useState(null);
     const [logo, setLogo] = useState(null);
+
+    const [showAlerta, setShowAlerta] = useState(false);
+    const [alertaConfig, setAlertaConfig] = useState({
+        title: '',
+        message: '',
+        type: 'error',
+        errors: {}
+    });
 
     useEffect(() => {
         // Toma el id de la liga madre si fue enviada
@@ -27,8 +35,16 @@ export default function AltaEquipos() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         const errores = validarEquipos({ nombre, entrenador })
+
         if (Object.keys(errores).length > 0) {
-            alert(Object.values(errores).join('\n'))
+            // Mostrar errores en la alerta
+            setAlertaConfig({
+                title: 'Error de Validación',
+                message: '',
+                type: 'error',
+                errors: errores
+            });
+            setShowAlerta(true);
             return
         }
         try{
@@ -36,8 +52,20 @@ export default function AltaEquipos() {
             setNombre('')
             setEntrenador('')
             setLogo(null)
-            alert('Equipo registrado exitosamente')
-            navigate('/')
+
+            // Mostrar éxito
+            setAlertaConfig({
+                title: 'Éxito',
+                message: 'Equipo registrado exitosamente',
+                type: 'success',
+                errors: {}
+            });
+            setShowAlerta(true);
+            
+            // Navegar después de cerrar la alerta
+            setTimeout(() => {
+                navigate('/')
+            }, 1500);
         }catch(error){
             console.error(error)
         }
@@ -92,6 +120,15 @@ export default function AltaEquipos() {
                     </div>
                 </form>
             </div>
+            {/* Alerta PopUp */}
+            <AlertaPopUp
+                show={showAlerta}
+                onClose={() => setShowAlerta(false)}
+                title={alertaConfig.title}
+                message={alertaConfig.message}
+                type={alertaConfig.type}
+                errors={alertaConfig.errors}
+            />
         </>
     )
 }
