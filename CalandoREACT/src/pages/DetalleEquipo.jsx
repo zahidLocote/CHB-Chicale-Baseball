@@ -40,6 +40,11 @@ export default function DetalleEquipo() {
 
   // Usamos URL completa del backend
   const logo = equipo.logoUrl || placeholderfoto
+  const cargarJugadores = () => {
+    obtenerJugadoresPorEquipo(id)
+      .then(setJugadores)
+      .catch(err => console.error("Error:", err));
+  };
 
   return (
     <>
@@ -70,11 +75,12 @@ export default function DetalleEquipo() {
         )}
 
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(`/ligas/${equipo.ligaId}/equipos`)}
           className="bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-400 w-36 text-center"
         >
           Regresar
         </button>
+
       </div>
 
       <div
@@ -125,8 +131,11 @@ export default function DetalleEquipo() {
         <AltaJugador
           equipoId={equipo.id}
           onClose={() => setMostrarModal(false)}
+          onJugadorAgregado={cargarJugadores}
         />
       )}
+
+
     </>
   )
 }

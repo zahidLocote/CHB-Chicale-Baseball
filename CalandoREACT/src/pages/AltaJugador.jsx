@@ -3,7 +3,7 @@ import { crearJugador } from '../../services/jugadorService';
 import { ImageUpload } from '../components/UI/ImageUpload';
 import { AlertaPopUp } from '../components/UI/AlertaPopUp';
 
-export default function AltaJugador({ equipoId, onClose }) {
+export default function AltaJugador({ equipoId, onClose, onJugadorAgregado }) {
 
   const [form, setForm] = useState({
     nombre: "",
@@ -79,18 +79,25 @@ export default function AltaJugador({ equipoId, onClose }) {
       foto: form.foto,
       equipoId
     };
-
     try {
       const result = await crearJugador(jugador);
 
+      if (typeof onJugadorAgregado === "function") {
+        onJugadorAgregado();  //refresca lista en pantalla sin recargar
+      }
+
       setAlertaConfig({
         title: 'Éxito',
-        message: result.message,
-        type: 'success'
+        message: result.message || 'Jugador registrado exitosamente',
+        type: 'success',
+        errors: {}
       });
+
       setShowAlerta(true);
 
-      setTimeout(() => onClose(), 1500);
+      setTimeout(() => {
+        onClose();
+      }, 1500);
 
     } catch (error) {
       setAlertaConfig({
