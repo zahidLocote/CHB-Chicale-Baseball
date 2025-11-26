@@ -6,8 +6,8 @@ export default function SlideshowLiga({ liga, equipos }) {
   const navigate = useNavigate()
 
   const slides = [
-    { type: 'liga', logo: liga?.logoUrl, nombre: liga?.nombreLiga },
-    ...equipos.map(e => ({ type: 'equipo', logo: e.logoUrl, nombre: e.nombreEquipo, id: e.id }))
+    { type: 'liga', logo: liga?.logo ? `http://localhost:3001/uploads/${liga.logo}` : null, nombre: liga?.nombreLiga },
+    ...equipos.map(e => ({ type: 'equipo', logo: e.logo ? `http://localhost:3001/uploads/${e.logo}` : null, nombre: e.nombreEquipo, id: e.id }))
   ]
 
   useEffect(() => {

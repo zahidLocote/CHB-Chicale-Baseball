@@ -72,7 +72,7 @@ export default function VentanaPrincipal() {
                     const dataAdapt = {
                         id: liga.id,
                         nombre: liga.nombreLiga,
-                        logo: liga.logoUrl
+                        logo: liga.logo
                     }
 
                     return (

@@ -15,7 +15,7 @@ export default function Slideshow() {
         const sistemaSlide = { type: 'system', logo: chicalisLogo }
         const ligaSlides = ligas.map(liga => ({
           type: 'liga',
-          logo: liga.logoUrl,
+          logo: liga.logo ? `http://localhost:3001/uploads/${liga.logo}` : chicalisLogo,
           nombre: liga.nombreLiga,
           id: liga.id
         }))
