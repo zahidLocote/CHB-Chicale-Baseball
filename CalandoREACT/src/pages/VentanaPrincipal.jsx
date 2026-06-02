@@ -59,9 +59,6 @@ export default function VentanaPrincipal() {
     }
     return (
         <>
-            <button onClick={() => navigate("/login")} className="bg-blue-200 text-blue-800 font-semibold px-4 py-2 rounded hover:bg-blue-300 cursor-pointer">
-                Iniciar sesion
-            </button>
             <Banner />
             <Slideshow />
             <h1 className="text-center font-bold text-3xl mb-6 font-race mt-12">Ligas</h1>

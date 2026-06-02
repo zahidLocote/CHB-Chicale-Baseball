@@ -60,6 +60,41 @@ export async function editarJugador(id, datosActualizados) {
 
   return await res.json();
 }
+// Editar jugador con foto (FormData)
+export async function editarJugadorConFoto(id, datos) {
+  const formData = new FormData();
+
+  formData.append('nombre', datos.nombre);
+  formData.append('apellidoPaterno', datos.apellidoPaterno);
+  formData.append('apellidoMaterno', datos.apellidoMaterno);
+  formData.append('fechaNacimiento', datos.fechaNacimiento);
+  formData.append('numero', datos.numero);
+  formData.append('posicion', datos.posicion);
+
+  if (datos.fotoFile instanceof File) {
+    formData.append('foto', datos.fotoFile);
+  }
+
+  if (typeof datos.foto === 'string' && datos.foto) {
+    formData.append('fotoActual', datos.foto);
+  }
+
+  if (datos.eliminarFoto) {
+    formData.append('eliminarFoto', 'true');
+  }
+
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: 'PUT',
+    body: formData
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Error al editar jugador');
+  }
+
+  return await res.json();
+}
 // Obtener jugador por ID
 export async function obtenerJugadorPorId(id) {
   const res = await fetch(`${BASE_URL}/${id}`);

@@ -3,11 +3,13 @@ import chicalisLogo from '../../assets/chicalis.png'   // logo
 import cityImage from '../../assets/city.png'         // imagen city
 import { obtenerLigas } from '../../../services/ligaService' // servicio en raíz
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 
 export default function Banner() {
   const [ligas, setLigas] = useState([])
   const [mostrarLigas, setMostrarLigas] = useState(false)
   const navigate = useNavigate()
+  const { esAdmin, usuario, logout } = useAuth()
 
   useEffect(() => {
     const cargar = async () => {
@@ -69,6 +71,28 @@ export default function Banner() {
         )}
       </div>
 
+      {/* Botón login/logout a la derecha */}
+      <div className="ml-auto flex items-center gap-4 relative z-10 mr-36">
+        {esAdmin ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold">{usuario?.usuario}</span>
+            <button
+              onClick={() => { logout(); navigate('/'); }}
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-3 py-1.5 rounded text-sm cursor-pointer"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => navigate('/login')}
+            className="bg-white/20 hover:bg-white/30 text-white font-semibold px-4 py-2 rounded cursor-pointer btn-race"
+          >
+            Iniciar sesión
+          </button>
+        )}
+      </div>
+
       {/* Imagen city a la derecha */}
       <div className="flex-shrink-0">
         <img
@@ -76,8 +100,8 @@ export default function Banner() {
           alt="City"
           className="h-24 w-auto absolute"
           style={{
-            top: '15px',   // mueve verticalmente (Y)
-            right: '30px', // mueve horizontalmente desde el borde derecho (X)
+            top: '15px',
+            right: '30px',
           }}
         />
       </div>

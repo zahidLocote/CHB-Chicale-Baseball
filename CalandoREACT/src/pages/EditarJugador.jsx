@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { obtenerJugadorPorId, editarJugador } from '../../services/jugadorService';
-import placeholderfoto from '../assets/placeholderfoto.jpg';
-import { AlertaPopUp } from '../components/UI/AlertaPopUp'
+import { obtenerJugadorPorId, editarJugador, editarJugadorConFoto } from '../../services/jugadorService';
+import { AlertaPopUp } from '../components/UI/AlertaPopUp';
+import { ImageUpload } from '../components/UI/ImageUpload';
 
 export default function EditarJugador() {
   const { id } = useParams();
@@ -19,6 +19,9 @@ export default function EditarJugador() {
   });
 
   const [errores, setErrores] = useState({});
+  const [fotoFile, setFotoFile] = useState(null);
+  const [fotoPreview, setFotoPreview] = useState(null);
+  const [eliminarFoto, setEliminarFoto] = useState(false);
 
   // Estados para la alerta
   const [showAlerta, setShowAlerta] = useState(false);
@@ -41,6 +44,9 @@ export default function EditarJugador() {
           posicion: data.posicion || '',
           foto: data.foto || ''
         });
+        if (data.foto) {
+          setFotoPreview(`http://localhost:3001/uploads/${data.foto}`);
+        }
       })
       .catch(error => {
         console.error('Error al cargar jugador:', error);
@@ -69,7 +75,25 @@ export default function EditarJugador() {
   };
 
   const handleRemoveFoto = () => {
-    setJugador(prev => ({ ...prev, foto: '' }));
+    setFotoFile(null);
+    setFotoPreview(null);
+    setEliminarFoto(true);
+  };
+
+  const handleImageChange = (file, error, preview) => {
+    if (error) {
+      setAlertaConfig({
+        title: 'Error',
+        message: error,
+        type: 'error',
+        errors: {}
+      });
+      setShowAlerta(true);
+      return;
+    }
+    setFotoFile(file);
+    setFotoPreview(preview);
+    setEliminarFoto(false);
   };
 
   const validar = () => {
@@ -113,30 +137,46 @@ export default function EditarJugador() {
     }
 
     setErrores(nuevosErrores);
-    return Object.keys(nuevosErrores).length === 0;
+    return { esValido: Object.keys(nuevosErrores).length === 0, nuevosErrores };
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    
-    if (!validar()) {
-      // Mostrar errores de validación en la alerta
+
+    const resultado = validar();
+    if (!resultado.esValido) {
       setAlertaConfig({
         title: 'Error de Validación',
         message: '',
         type: 'error',
-        errors: errores
+        errors: resultado.nuevosErrores
       });
       setShowAlerta(true);
       return;
     }
 
     try {
-      await editarJugador(id, {
+      const jugadorData = {
         ...jugador,
         numero: parseInt(jugador.numero),
         fechaNacimiento: new Date(jugador.fechaNacimiento)
-      });
+      };
+
+      if (fotoFile || eliminarFoto) {
+        await editarJugadorConFoto(id, {
+          nombre: jugador.nombre,
+          apellidoPaterno: jugador.apellidoPaterno,
+          apellidoMaterno: jugador.apellidoMaterno,
+          fechaNacimiento: jugador.fechaNacimiento,
+          numero: parseInt(jugador.numero),
+          posicion: jugador.posicion,
+          fotoFile: fotoFile,
+          foto: jugador.foto,
+          eliminarFoto: eliminarFoto
+        });
+      } else {
+        await editarJugador(id, jugadorData);
+      }
       
       // Mostrar éxito
       setAlertaConfig({
@@ -166,8 +206,6 @@ export default function EditarJugador() {
     }
   };
 
-  const fotoPreview = jugador.foto ? `/uploads/${jugador.foto}` : placeholderfoto;
-
   const opcionesPosicion = [
     { value: 'P', label: 'Pitcher' },
     { value: 'C', label: 'Catcher' },
@@ -188,20 +226,13 @@ export default function EditarJugador() {
         <h1 className="text-2xl font-bold mb-4 text-center">Editar Jugador</h1>
 
         <div className="flex flex-col items-center mb-6">
-          <img
-            src={fotoPreview}
-            alt="Foto del jugador"
-            className="w-32 h-32 object-cover rounded-full shadow mb-2"
+          <ImageUpload
+            label="Foto del jugador"
+            name="fotoJugadorEdit"
+            imagePreview={fotoPreview}
+            onImageChange={handleImageChange}
+            onImageRemove={handleRemoveFoto}
           />
-          {jugador.foto && (
-            <button
-              type="button"
-              onClick={handleRemoveFoto}
-              className="text-red-600 hover:underline text-sm"
-            >
-              Quitar foto
-            </button>
-          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
