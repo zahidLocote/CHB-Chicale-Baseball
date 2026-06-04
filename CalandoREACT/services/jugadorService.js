@@ -40,7 +40,7 @@ export async function eliminarJugador(id) {
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Error al eliminar jugador');
+    throw new Error(errorData.detail || errorData.message || 'Error al editar jugador');
   }
 
   return await res.json();
@@ -90,7 +90,7 @@ export async function editarJugadorConFoto(id, datos) {
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Error al editar jugador');
+    throw new Error(errorData.detail || errorData.message || 'Error al editar jugador');
   }
 
   return await res.json();

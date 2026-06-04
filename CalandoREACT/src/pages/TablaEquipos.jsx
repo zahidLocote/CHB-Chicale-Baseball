@@ -70,7 +70,7 @@ export default function TablaEquipos() {
       <SlideshowLiga liga={liga} equipos={equipos} />
 
       <h1 className='text-center text-3xl font-race mt-12'>
-        Equipos en la liga {liga?.nombreLiga}
+        Equipos en: {liga?.nombreLiga}
       </h1>
 
       {/* Tarjetas de equipos */}

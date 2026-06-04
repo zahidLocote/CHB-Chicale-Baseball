@@ -104,8 +104,8 @@ router.put('/:id', upload.single('foto'), async (req, res) => {
     });
     res.json(actualizado);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error al editar jugador' });
+    console.error('Error en PUT jugador:', error);
+    res.status(500).json({ message: 'Error al editar jugador', detail: error.message, code: error.code });
   }
 });
 // Eliminar
